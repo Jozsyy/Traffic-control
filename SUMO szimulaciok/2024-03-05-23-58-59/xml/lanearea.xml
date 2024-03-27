@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2024-03-16 13:54:07 by Eclipse SUMO polyconvert Version 1.19.0
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/polyconvertConfiguration.xsd">
+
+    <input>
+        <net-file value="osm.net.xml.gz"/>
+        <osm-files value="osm_bbox.osm.xml.gz"/>
+        <osm.keep-full-type value="true"/>
+        <type-file value="${SUMO_HOME}/data/typemap/osmPolyconvert.typ.xml"/>
+    </input>
+
+    <output>
+        <output-file value="osm.poly.xml.gz"/>
+    </output>
+
+    <report>
+        <verbose value="true"/>
+    </report>
+
+</configuration>
+-->
+
+<additional>
+    <laneAreaDetector id="laneAreaDetector1" lanes="-948993200#1_0" pos="0" endPos="39.7" file="output.xlsx"	tl="cluster_1936414352_1936414379_26003429_7516041220_#2more"/>
+	<laneAreaDetector id="laneAreaDetector2" lanes="-198516616#9_1" pos="0" endPos="62" file="output.xlsx"	tl="cluster_1936414352_1936414379_26003429_7516041220_#2more"/>
+	<laneAreaDetector id="laneAreaDetector3" lanes="-198516616#9_0" pos="0" endPos="62" file="output.xlsx"	tl="cluster_1936414352_1936414379_26003429_7516041220_#2more"/>
+	<laneAreaDetector id="laneAreaDetector4" lanes="198516616#5_1" pos="0" endPos="33.3" file="output.xlsx"	tl="cluster_1936414352_1936414379_26003429_7516041220_#2more"/>
+	<laneAreaDetector id="laneAreaDetector5" lanes="198516616#5_0" pos="0" endPos="33.3" file="output.xlsx"	tl="cluster_1936414352_1936414379_26003429_7516041220_#2more"/>
+</additional>
