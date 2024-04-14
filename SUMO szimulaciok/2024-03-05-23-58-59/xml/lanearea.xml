@@ -22,9 +22,24 @@
 -->
 
 <additional>
-    <laneAreaDetector id="laneAreaDetector1" lanes="-948993200#1_0" pos="0" endPos="39.7" file="output.xlsx"	tl="cluster_1936414352_1936414379_26003429_7516041220_#2more"/>
-	<laneAreaDetector id="laneAreaDetector2" lanes="-198516616#9_1" pos="0" endPos="62" file="output.xlsx"	tl="cluster_1936414352_1936414379_26003429_7516041220_#2more"/>
-	<laneAreaDetector id="laneAreaDetector3" lanes="-198516616#9_0" pos="0" endPos="62" file="output.xlsx"	tl="cluster_1936414352_1936414379_26003429_7516041220_#2more"/>
-	<laneAreaDetector id="laneAreaDetector4" lanes="198516616#5_1" pos="0" endPos="33.3" file="output.xlsx"	tl="cluster_1936414352_1936414379_26003429_7516041220_#2more"/>
-	<laneAreaDetector id="laneAreaDetector5" lanes="198516616#5_0" pos="0" endPos="33.3" file="output.xlsx"	tl="cluster_1936414352_1936414379_26003429_7516041220_#2more"/>
+	<!-- Dozsa Gyorgy kicsi keresztezodes -->
+    <laneAreaDetector id="laneAreaDetector1" lanes="-948993200#1_0" pos="0" endPos="39.7" file="output.xlsx" tl="cluster_1936414352_1936414379_26003429_7516041220_#2more"/>
+	<laneAreaDetector id="laneAreaDetector2" lanes="198516616#5_0" pos="0" endPos="33.3" file="output.xlsx"	tl="cluster_1936414352_1936414379_26003429_7516041220_#2more"/>
+	<laneAreaDetector id="laneAreaDetector3" lanes="198516616#5_1" pos="0" endPos="33.3" file="output.xlsx"	tl="cluster_1936414352_1936414379_26003429_7516041220_#2more"/>
+	<laneAreaDetector id="laneAreaDetector4" lanes="-198516616#9_0" pos="0" endPos="62" file="output.xlsx"	tl="cluster_1936414352_1936414379_26003429_7516041220_#2more"/>
+	<laneAreaDetector id="laneAreaDetector5" lanes="-198516616#9_1" pos="0" endPos="62" file="output.xlsx"	tl="cluster_1936414352_1936414379_26003429_7516041220_#2more"/>
+	
+	<!-- Reformatus kollegiumi keresztezodes -->
+	<laneAreaDetector id="laneAreaDetector-43791591#1_0" lanes="-869058993_0 -43791591#2_0 -43791591#1_0" pos="0" endPos="21.5" file="output.xlsx" tl="cluster_1987096989_257998255_26003945_7717709774_#1more"/>
+	<laneAreaDetector id="laneAreaDetector-43791591#1_1" lanes="-869058993_1 -43791591#2_1 -43791591#1_1" pos="0" endPos="21.5" file="output.xlsx" tl="cluster_1987096989_257998255_26003945_7717709774_#1more"/>
+	<laneAreaDetector id="laneAreaDetector-43791591#1_2" lanes="-869058993_2 -43791591#2_2 -43791591#1_2" pos="0" endPos="21.5" file="output.xlsx" tl="cluster_1987096989_257998255_26003945_7717709774_#1more"/>
+	<laneAreaDetector id="laneAreaDetector-954637017#1_0" lanes="-954637017#1_0" pos="0" endPos="73.4" file="output.xlsx" tl="cluster_1987096989_257998255_26003945_7717709774_#1more"/>
+	<laneAreaDetector id="laneAreaDetector826606609#0_0" lanes="826606611_0 826606610_0 826606609#0_0" pos="0" endPos="30.25" file="output.xlsx" tl="cluster_1987096989_257998255_26003945_7717709774_#1more"/>
+	<laneAreaDetector id="laneAreaDetector826606609#0_1" lanes="826606609#0_1" pos="0" endPos="30.3" file="output.xlsx" tl="cluster_1987096989_257998255_26003945_7717709774_#1more"/>
+	<laneAreaDetector id="laneAreaDetector826606609#0_2" lanes="826606611_1 826606610_1 826606609#0_2" pos="0" endPos="30.4" file="output.xlsx" tl="cluster_1987096989_257998255_26003945_7717709774_#1more"/>
+	<laneAreaDetector id="laneAreaDetector23349324#4_0" lanes="23349324#3_0 23349324#4_0" pos="0" endPos="37.5" file="output.xlsx" tl="cluster_1987096989_257998255_26003945_7717709774_#1more"/>
+	<laneAreaDetector id="laneAreaDetector23349324#4_1" lanes="23349324#3_1 23349324#4_1" pos="0" endPos="37.5" file="output.xlsx" tl="cluster_1987096989_257998255_26003945_7717709774_#1more"/>
+	
+
+	
 </additional>
