@@ -17,8 +17,6 @@ class OUT_MEM:
 class Fuz_Sys:
     def __init__(self):
         self.Emem = IN_MEM()
-        self.Edotmem = IN_MEM()
-        self.Imem = IN_MEM()
         self.Outmem = OUT_MEM()
 
 def MAX(a,b):
@@ -34,20 +32,12 @@ def MIN(a,b):
         return b
     
 def Fuzzy_Init(Fuzzy_System):
-    Fuzzy_System.Emem.Width1 = 10
-    Fuzzy_System.Emem.Width2 = 4
-    Fuzzy_System.Edotmem.Width1 = 10
-    Fuzzy_System.Edotmem.Width2 = 4
-    Fuzzy_System.Imem.Width1 = 10
-    Fuzzy_System.Imem.Width2 = 4
+    Fuzzy_System.Emem.Width1 = 5
+    Fuzzy_System.Emem.Width2 = 2
 
     for i in range(0, 5):
-        Fuzzy_System.Emem.Center1[i]=5*(i+1)
+        Fuzzy_System.Emem.Center1[i]=5*i
         Fuzzy_System.Emem.Center2[i]=2*(i)-4
-        Fuzzy_System.Edotmem.Center1[i]=5*(i+1)
-        Fuzzy_System.Edotmem.Center2[i]=2*-4
-        Fuzzy_System.Imem.Center1[i]=5*(i+1)
-        Fuzzy_System.Imem.Center2[i]=2*-4
 
 def LeftAll(u,w,c):
     if u<c:
@@ -75,74 +65,113 @@ def Fuzzyify(U1, U2, Mem):
         Mem.Dom2[i] = Triangle(U2, Mem.Width2, Mem.Center2[i])
     Mem.Dom1[4] = RightAll(U1, Mem.Width1, Mem.Center1[4])
     Mem.Dom2[4] = RightAll(U2, Mem.Width2, Mem.Center2[4])
+    print(Mem.Dom1)
+    print(Mem.Dom2)
 
-def Match(Emem, Edotmem, Imem, Pos):
+def rules(i, j):    #i jeloli a sor hosszat, j pedig a valtozast
+    #i=0
+    if i==0 and j==0:
+        return -4
+    elif i==0 and j==1:
+        return -4
+    elif i==0 and j==2:
+        return -2
+    elif i==0 and j==3:
+        return 0
+    elif i==0 and j==4:
+        return 2
+    #i=1
+    elif i==1 and j==0:
+        return -4
+    elif i==1 and j==1:
+        return -2
+    elif i==1 and j==2:
+        return 0
+    elif i==1 and j==3:
+        return 0
+    elif i==1 and j==4:
+        return 2
+    #i=2
+    elif i==2 and j==0:
+        return -2
+    elif i==2 and j==1:
+        return 0
+    elif i==2 and j==2:
+        return 2
+    elif i==2 and j==3:
+        return 2
+    elif i==2 and j==4:
+        return 4
+    #i=3
+    elif i==3 and j==0:
+        return 0
+    elif i==3 and j==1:
+        return 2
+    elif i==3 and j==2:
+        return 2
+    elif i==3 and j==3:
+        return 4
+    elif i==3 and j==4:
+        return 4
+    #i=4
+    elif i==4 and j==0:
+        return 2
+    elif i==4 and j==1:
+        return 2
+    elif i==4 and j==2:
+        return 4
+    elif i==4 and j==3:
+        return 4
+    elif i==4 and j==4:
+        return 4
+    
 
-    Pos1 = [0]*5
+def Match(Emem):
+    Pos = {-4:0, -2:0, 0:0, 2:0, 4:0}
+
     for i in range(0,5):
-        if Emem.Dom1[i] != 0 and Emem.Dom2[i]:
-            Pos1[i]=min(Emem.Dom1[i], Emem.Dom2[i])
-        else:
-            Pos1[i]=0
+        for j in range(0,5):
+            if Emem.Dom1[i]!=0 and Emem.Dom2[j]!=0:
+                rule=rules(i,j)
+                value=min(Emem.Dom1[i], Emem.Dom2[j])
+                if Pos[rule]!=0:
+                    Pos[rule]=max(value,Pos[rule])
+                else:
+                    Pos[rule]=value
 
-    #Sulyozott atlag
-    Pos[0]=(Pos1[0]*5+Pos1[1]*10+Pos1[2]*15+Pos1[3]*20+Pos1[4]*25)/(5+10+15+20+25)
-    print(Emem.Dom1, Emem.Dom2)
-    print(Pos1)
-
-    Pos2 = [0]*5
-    for i in range(0,5):
-        if Edotmem.Dom1[i] != 0 and Edotmem.Dom2[i]:
-            Pos2[i]=min(Edotmem.Dom1[i], Edotmem.Dom2[i])
-        else:
-            Pos2[i]=0
-
-    Pos[1]=(Pos2[0]*5+Pos2[1]*10+Pos2[2]*15+Pos2[3]*20+Pos2[4]*25)/(5+10+15+20+25)
-    print(Pos2)
-    Pos3 = [0]*5
-    for i in range(0,5):
-        if Imem.Dom1[i] != 0 and Imem.Dom2[i]:
-            Pos3[i]=min(Imem.Dom1[i], Imem.Dom2[i])
-        else:
-            Pos3[i]=0
-    Pos[2]=(Pos3[0]*5+Pos3[1]*10+Pos3[2]*15+Pos3[3]*20+Pos3[4]*25)/(5+10+15+20+25)
-    print(Pos3)
-    print(Pos)
+    print("Pos="+str(Pos))
+    return Pos
 
 #Sulyozott atlag
 def Inf_Defuzz(Pos):
-    res=max(Pos[0], Pos[1], Pos[2])
-    print(res)
-    if res <= 0.2:
-        return -5
-    elif res > 0.2 and res <= 0.4:
-        return -2
-    elif res > 0.4 and res <= 0.6:
-        return 0
-    elif res > 0.6 and res <= 0.8:
-        return 2
-    elif res > 0.8:
-        return 5
-    else:
-         return 0
+    weighted_sum = 0
+    total_weight = 0
 
-def Fuzzy_Control(e1, e2, edot1, edot2, inp1, inp2, Fuzzy_System):
-    Pos = [0] * 3
+    for rule, value in Pos.items():
+        # A szabály súlya maga a szabály értéke
+        weighted_sum += value * rule
+        total_weight += value
+
+    print(weighted_sum)
+    print(total_weight)
+
+    if total_weight != 0:
+        defuzzified_value = weighted_sum / total_weight
+        return defuzzified_value
+    else:
+        return None  
+
+def Fuzzy_Control(e1, e2, Fuzzy_System):
     Fuzzyify(e1, e2, Fuzzy_System.Emem)
-    Fuzzyify(edot1, edot2, Fuzzy_System.Edotmem)
-    Fuzzyify(inp1, inp2, Fuzzy_System.Imem)
-    Match(Fuzzy_System.Emem, Fuzzy_System.Edotmem,Fuzzy_System.Imem, Pos)
+    Pos=Match(Fuzzy_System.Emem)
     return Inf_Defuzz(Pos)
 
-# Teszt
 '''
+# Teszt
 Fuzzy_System = Fuz_Sys()
 Fuzzy_Init(Fuzzy_System)
-e1 = 10
-e2 = -2
-edot1 = 15
-edot2 = 2
-inp1 = 20
-inp2 = 1
-print("Fuzzy control:", Fuzzy_Control(e1, e2, edot1, edot2, inp1, inp2, Fuzzy_System))
+e1 = 30
+e2 = 6
+print("Fuzzy control:", Fuzzy_Control(e1, e2, Fuzzy_System))
+
 '''

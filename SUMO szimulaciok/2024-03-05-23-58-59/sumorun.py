@@ -23,8 +23,9 @@ lane5_cars_prev=0
 
 traffic_light_ref="cluster_1987096989_257998255_26003945_7717709774_#1more"
 sequence=1
-sequence_time=50
-delta_t=0
+sequence_time1=50
+sequence_time2=50
+sequence_time3=50
 delta_t1=0
 delta_t2=0
 delta_t3=0
@@ -33,7 +34,7 @@ sequence1_cars_prev=0
 sequence2_cars_prev=0
 sequence3_cars_prev=0
 
-def sequence_control():
+def sequence_control(sequence):
         global sequence1_cars_prev
         global sequence2_cars_prev
         global sequence3_cars_prev
@@ -70,11 +71,20 @@ def sequence_control():
         sequence2_change=sequence2_cars_prev-sequence2_cars
         sequence3_change=sequence3_cars_prev-sequence3_cars
 
+        print(f"Sequence 1 change:{sequence1_change}")
+        print(f"Sequence 2 change:{sequence2_change}")
+        print(f"Sequence 3 change:{sequence3_change}")
+
 
         #Fuzzy control
         Fuzzy_System = fz.Fuz_Sys()
         fz.Fuzzy_Init(Fuzzy_System)
-        fuzzy_output=fz.Fuzzy_Control(sequence1_cars, sequence1_change, sequence2_cars, sequence2_change, sequence3_cars, sequence3_change, Fuzzy_System)
+        if sequence==1:
+                fuzzy_output=fz.Fuzzy_Control(sequence1_cars, sequence1_change, Fuzzy_System)
+        elif sequence==2:
+                fuzzy_output=fz.Fuzzy_Control(sequence2_cars, sequence2_change, Fuzzy_System)
+        else:
+                fuzzy_output=fz.Fuzzy_Control(sequence3_cars, sequence3_change, Fuzzy_System)
 
         #Update previous waiting cars by sequence
         sequence1_cars_prev=sequence1_cars
@@ -82,7 +92,7 @@ def sequence_control():
         sequence3_cars_prev=sequence3_cars
 
         print(f"Fuzzy output: {fuzzy_output}")
-        return fuzzy_output
+        return round(fuzzy_output,0)
 
 while traci.simulation.getMinExpectedNumber()>0:
         print(f"Step {step}:")
@@ -94,78 +104,14 @@ while traci.simulation.getMinExpectedNumber()>0:
             
         ##----------MACHINE LEARNING CODES/FUNCTIONS HERE----------##
 
-        '''
-        traffic_light = "cluster_1936414352_1936414379_26003429_7516041220_#2more"
 
-        detector1="laneAreaDetector1"
-        detector2="laneAreaDetector2"
-        detector3="laneAreaDetector3"
-        detector4="laneAreaDetector4"
-        detector5="laneAreaDetector5"
-
+        ##---------------------------------------------------------------##
         
-        if step<10 or step>40:
-                #traci.trafficlight.setPhaseDuration(traffic_light, 5)
-                traci.trafficlight.setRedYellowGreenState(traffic_light, "rrrrrrGGGrrGGG")
-        else:
-                #traci.trafficlight.setPhaseDuration(traffic_light, 5)
-                traci.trafficlight.setRedYellowGreenState(traffic_light, "yyyyrrrGGyyyGG")
 
-        tls="258668307"
-        traci.trafficlight.setRedYellowGreenState(tls, "rr")
-        '''
-        ### Dozsa Gyorgy utca
-        '''
-        if step%5==0:
 
-                lane1_cars=traci.lanearea.getLastStepVehicleNumber(detector1)
-                lane2_cars=traci.lanearea.getLastStepVehicleNumber(detector2)
-                lane3_cars=traci.lanearea.getLastStepVehicleNumber(detector3)
-                lane4_cars=traci.lanearea.getLastStepVehicleNumber(detector4)
-                lane5_cars=traci.lanearea.getLastStepVehicleNumber(detector5)
+        ##----------CONTROL Vehicles and Traffic Lights----------##
 
-                print("Cars waiting in lane 1:"+str(lane1_cars))
-                print("Cars waiting in lane 2:"+str(lane2_cars))
-                print("Cars waiting in lane 3:"+str(lane3_cars))
-                print("Cars waiting in lane 4:"+str(lane4_cars))
-                print("Cars waiting in lane 5:"+str(lane5_cars))
 
-                lane1_change=lane1_cars-lane1_cars_prev
-                lane2_change=lane2_cars-lane2_cars_prev
-                lane3_change=lane3_cars-lane3_cars_prev
-                lane4_change=lane4_cars-lane4_cars_prev
-                lane5_change=lane5_cars=lane5_cars_prev
-
-                print("Cars waiting in lane 1 - prev:"+str(lane1_change))
-                print("Cars waiting in lane 2 - prev:"+str(lane2_change))
-                print("Cars waiting in lane 3 - prev:"+str(lane3_change))
-                print("Cars waiting in lane 4 - prev:"+str(lane4_change))
-                print("Cars waiting in lane 5 - prev:"+str(lane5_change))
-
-                #Fuzzy logic
-                Fuzzy_System = fz.Fuz_Sys()
-                fz.Fuzzy_Init(Fuzzy_System)
-
-                #input1=[lane1_cars/12, lane1_change/12]
-                #input2=[(lane2_cars+lane3_cars)/12, (lane2_change+lane3_change)/12]
-                #input3=[(lane4_cars+lane5_cars)/12, (lane4_change+lane5_change)/12]
-
-                #print(input1, input2)
-
-                output_fuzzy=fz.Fuzzy_Control(lane1_cars, lane2_cars, Fuzzy_System)
-                print("Fuzzy control:", output_fuzzy)
-
-                if output_fuzzy<0.5:
-                        traci.trafficlight.setRedYellowGreenState(traffic_light, "rrrrGGGGGGGGGG")
-                else:
-                        traci.trafficlight.setRedYellowGreenState(traffic_light, "GGGGrrrrrrrrrr")
-
-                lane1_cars_prev=lane1_cars
-                lane2_cars_prev=lane2_cars
-                lane3_cars_prev=lane3_cars
-                lane4_cars_prev=lane4_cars
-                lane5_cars_prev=lane5_cars
-        '''
         
         ### Reformatus kollegium utca
         detector1_0="laneAreaDetector-43791591#1_0"
@@ -181,7 +127,8 @@ while traci.simulation.getMinExpectedNumber()>0:
         if step==next_sequence and sequence==1:
                 traci.trafficlight.setRedYellowGreenState(traffic_light_ref, "GGGrrrrrrrGGGrrrrrr")
                 if step>0:
-                        delta_t1=sequence_control()
+                        delta_t1=sequence_control(sequence)
+                        print(delta_t1)
                 else: 
                         lane1_0=traci.lanearea.getLastStepVehicleNumber(detector1_0)
                         lane1_1=traci.lanearea.getLastStepVehicleNumber(detector1_1)
@@ -215,22 +162,73 @@ while traci.simulation.getMinExpectedNumber()>0:
                         sequence2_cars_prev=sequence2_cars
                         sequence3_cars_prev=sequence3_cars
                         delta_t1=0
-                next_sequence+=sequence_time+delta_t1
+
+                sequence_time1+=delta_t1  #meddig tartson a zold jelzes
+
+                #fuzzy altal meghatarozott +- ido levonasa/hozzaadasa a tobbi zold jelzeshez
+                if delta_t1!=0 and delta_t1%2==0:
+                        sequence_time2-=delta_t1/2
+                        sequence_time3-=delta_t1/2
+                elif delta_t1!=0 and delta_t1%2!=0:
+                        sequence_time2-=round(delta_t1/2,0)
+                        delta_t1-=round(delta_t1/2,0)
+                        sequence_time3-=delta_t1
+
+                next_sequence+=sequence_time1
                 sequence+=1
+                print("Time:")
+                print(sequence_time1+sequence_time2+sequence_time3)
+                print(sequence_time1)
+                print(sequence_time2)
+                print(sequence_time3)
 
         elif step==next_sequence and sequence==2:
                 #traci.trafficlight.setPhaseDuration(traffic_light_ref, sequence_time)
                 traci.trafficlight.setRedYellowGreenState(traffic_light_ref, "rrrgggggggrrrggrrrr")
-                delta_t2=delta_t1=sequence_control()
-                next_sequence+=sequence_time+delta_t2
+                delta_t2=sequence_control(sequence)
+                print(delta_t2)
+                sequence_time2+=delta_t2  #meddig tartson a zold jelzes
+
+                #fuzzy altal meghatarozott +- ido levonasa/hozzaadasa a tobbi zold jelzeshez
+                if delta_t2!=0 and delta_t2%2==0:
+                        sequence_time3-=delta_t2/2
+                        sequence_time1-=delta_t2/2
+                elif delta_t2!=0 and delta_t2%2!=0:
+                        sequence_time3-=round(delta_t2/2,0)
+                        delta_t2-=round(delta_t2/2,0)
+                        sequence_time1-=delta_t2
+                
+                next_sequence+=sequence_time2
                 sequence+=1
+                print("Time:")
+                print(sequence_time1+sequence_time2+sequence_time3)
+                print(sequence_time1)
+                print(sequence_time2)
+                print(sequence_time3)
 
         elif step==next_sequence and sequence==3:
                 #traci.trafficlight.setPhaseDuration(traffic_light_ref, sequence_time-5)
                 traci.trafficlight.setRedYellowGreenState(traffic_light_ref, "Grrrrrrrrrrrrrrgggg")
-                delta_t3=delta_t1=sequence_control()
-                next_sequence+=sequence_time+delta_t3
+                delta_t3=sequence_control(sequence)
+                print(delta_t3)
+                sequence_time3+=delta_t3  #meddig tartson a zold jelzes
+
+                #fuzzy altal meghatarozott +- ido levonasa/hozzaadasa a tobbi zold jelzeshez
+                if delta_t3!=0 and delta_t3%2==0:
+                        sequence_time1-=delta_t3/2
+                        sequence_time2-=delta_t3/2
+                elif delta_t3!=0 and delta_t3%2!=0:
+                        sequence_time1-=round(delta_t3/2,0)
+                        delta_t3-=round(delta_t3/2,0)
+                        sequence_time2-=delta_t3
+
+                next_sequence+=sequence_time3
                 sequence=1
+                print("Time:")
+                print(sequence_time1+sequence_time2+sequence_time3)
+                print(sequence_time1)
+                print(sequence_time2)
+                print(sequence_time3)
         
         #Szekvenciak
         #traci.trafficlight.setRedYellowGreenState(traffic_light_ref, "GGGrrrrrrrGGGrrrrrr")
@@ -238,27 +236,27 @@ while traci.simulation.getMinExpectedNumber()>0:
         #traci.trafficlight.setRedYellowGreenState(traffic_light_ref, "rrrgggggggrrrggrrrr")
 
 
-        ##---------------------------------------------------------------##
-        
-
-
-        ##----------CONTROL Vehicles and Traffic Lights----------##
-
-
-        #***SET FUNCTION FOR TRAFFIC LIGHTS***
-        #REF: https://sumo.dlr.de/docs/TraCI/Change_Traffic_Lights_State.html
-        trafficlightduration = [5,37,5,35,6,3]
-        trafficsignal = ["rrrrrrGGGGgGGGrr", "yyyyyyyyrrrrrrrr", "rrrrrGGGGGGrrrrr", "rrrrryyyyyyrrrrr", "GrrrrrrrrrrGGGGg", "yrrrrrrrrrryyyyy"]
-        tfl = "1529566418"
-        #traci.trafficlight.setPhaseDuration(tfl, trafficlightduration[randrange(6)])
-        #traci.trafficlight.setRedYellowGreenState(tfl, trafficsignal[randrange(6)])
-        traci.trafficlight.setPhaseDuration(tfl, 30)
-        traci.trafficlight.setRedYellowGreenState(tfl, "GGGGGGGGGGGGGGGGGGGGyyyyyRRRR")
-
         ##------------------------------------------------------##
 
         vehicles=traci.vehicle.getIDList()
         trafficlights=traci.trafficlight.getIDList()
+
+        '''
+        if step % 5 == 0:
+                lane1_0=traci.lanearea.getLastStepVehicleNumber(detector1_0)
+                lane1_1=traci.lanearea.getLastStepVehicleNumber(detector1_1)
+                lane1_2=traci.lanearea.getLastStepVehicleNumber(detector1_2)
+                lane2_0=traci.lanearea.getLastStepVehicleNumber(detector2_0)
+                lane3_0=traci.lanearea.getLastStepVehicleNumber(detector3_0)
+                lane3_1=traci.lanearea.getLastStepVehicleNumber(detector3_1)
+                lane3_2=traci.lanearea.getLastStepVehicleNumber(detector3_2)
+                lane4_0=traci.lanearea.getLastStepVehicleNumber(detector4_0)
+                lane4_1=traci.lanearea.getLastStepVehicleNumber(detector4_1)
+
+                sequence1_cars_prev=lane1_0+lane1_1+lane3_0+lane3_1
+                sequence2_cars_prev=lane1_2+lane2_0+lane3_2
+                sequence3_cars_prev=lane4_0+lane4_1
+        '''
 
         step += 1
 traci.close()
