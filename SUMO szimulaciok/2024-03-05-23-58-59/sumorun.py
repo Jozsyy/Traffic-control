@@ -22,6 +22,8 @@ lane4_cars_prev=0
 lane5_cars_prev=0
 
 traffic_light_ref="cluster_1987096989_257998255_26003945_7717709774_#1more"
+traffic_ligt_kozpont="joinedS_cluster_1048507714_1528675438_248743350_248743351_#2more_cluster_248743346_3620518112_513613012_cluster_26003932_3620518113_3620518114"
+
 sequence=1
 sequence_time1=50
 sequence_time2=50
@@ -235,28 +237,10 @@ while traci.simulation.getMinExpectedNumber()>0:
         #traci.trafficlight.setRedYellowGreenState(traffic_light_ref, "Grrrrrrrrrrrrrrgggg")
         #traci.trafficlight.setRedYellowGreenState(traffic_light_ref, "rrrgggggggrrrggrrrr")
 
+       
+        #Szekvenciak
+        traci.trafficlight.setRedYellowGreenState(traffic_ligt_kozpont, "rggrrrrrrrgggrrrrrrgrrrrrr")
 
-        ##------------------------------------------------------##
-
-        vehicles=traci.vehicle.getIDList()
-        trafficlights=traci.trafficlight.getIDList()
-
-        '''
-        if step % 5 == 0:
-                lane1_0=traci.lanearea.getLastStepVehicleNumber(detector1_0)
-                lane1_1=traci.lanearea.getLastStepVehicleNumber(detector1_1)
-                lane1_2=traci.lanearea.getLastStepVehicleNumber(detector1_2)
-                lane2_0=traci.lanearea.getLastStepVehicleNumber(detector2_0)
-                lane3_0=traci.lanearea.getLastStepVehicleNumber(detector3_0)
-                lane3_1=traci.lanearea.getLastStepVehicleNumber(detector3_1)
-                lane3_2=traci.lanearea.getLastStepVehicleNumber(detector3_2)
-                lane4_0=traci.lanearea.getLastStepVehicleNumber(detector4_0)
-                lane4_1=traci.lanearea.getLastStepVehicleNumber(detector4_1)
-
-                sequence1_cars_prev=lane1_0+lane1_1+lane3_0+lane3_1
-                sequence2_cars_prev=lane1_2+lane2_0+lane3_2
-                sequence3_cars_prev=lane4_0+lane4_1
-        '''
 
         step += 1
 traci.close()
