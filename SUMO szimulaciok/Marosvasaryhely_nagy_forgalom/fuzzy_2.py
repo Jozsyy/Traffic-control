@@ -3,17 +3,16 @@ import numpy as np
 
 class IN_MEM:
     def __init__(self):
-        self.Width1 = 0.0
-        self.Center1 = [0.0] * 5
-        self.Dom1 = [0.0] * 5
+        self.Width1 = 0.0   #1. bemenet fuzzy halmazainak szelessege
+        self.Center1 = [0.0] * 5    #1. bemeneti fuzzy halmazok kozeppontjai (ahol a tagsagi fok a legmagasabb = 1)
+        self.Dom1 = [0.0] * 5   #Domain <- Mennyire tartozik a fuzzy halmazhoz a bemenet
         self.Width2 = 0.0
         self.Center2 = [0.0] * 5
         self.Dom2 = [0.0] * 5
 
 class OUT_MEM:
     def __init__(self):
-        self.Pos = {-4:0, -2:0, 0:0, 2:0, 4:0}
-        self.Width =[0.0] * 5
+        self.value=0.0
 
 class Fuz_Sys:
     def __init__(self):
@@ -35,7 +34,6 @@ def MIN(a,b):
 def Fuzzy_Init(Fuzzy_System):
     Fuzzy_System.Emem.Width1 = 5
     Fuzzy_System.Emem.Width2 = 2
-    Fuzzy_System.Outmem.Width = 2
 
     for i in range(0, 5):
         Fuzzy_System.Emem.Center1[i]=5*i
@@ -67,8 +65,8 @@ def Fuzzyify(U1, U2, Mem):
         Mem.Dom2[i] = Triangle(U2, Mem.Width2, Mem.Center2[i])
     Mem.Dom1[4] = RightAll(U1, Mem.Width1, Mem.Center1[4])
     Mem.Dom2[4] = RightAll(U2, Mem.Width2, Mem.Center2[4])
-    #print(Mem.Dom1)
-    #print(Mem.Dom2)
+    print(Mem.Dom1)
+    print(Mem.Dom2)
 
 def rules(i, j):    #i jeloli a sor hosszat, j pedig a valtozast
     #i=0
@@ -128,62 +126,49 @@ def rules(i, j):    #i jeloli a sor hosszat, j pedig a valtozast
         return 4
     
 
-def Match(Emem,Outmem):
+def Match(Emem):
+    Pos = {-4:0, -2:0, 0:0, 2:0, 4:0}
+
     for i in range(0,5):
         for j in range(0,5):
             if Emem.Dom1[i]!=0 and Emem.Dom2[j]!=0:
                 rule=rules(i,j)
-                value=min(Emem.Dom1[i], Emem.Dom2[j])     
-                Outmem.Pos[rule]=max(value,Outmem.Pos[rule])
+                value=min(Emem.Dom1[i], Emem.Dom2[j])
+                if Pos[rule]!=0:
+                    Pos[rule]=max(value,Pos[rule])
+                else:
+                    Pos[rule]=value
 
-    #print("Pos="+str(Outmem.Pos))
-
-def area_trapezoid(b,h):
-    #Haromszog magassaga = 1
-    #a-kisalap - kiszamitjuk
-    #b-nagyalap
-    #h-vagas amivel levagjuk a haromszog tetejet
-
-    a = (1-h)*b
-    area=(a+b)*h/2
-    return area
+    print("Pos="+str(Pos))
+    return Pos
 
 #Sulyozott atlag
-def Inf_Defuzz(Outmem):
+def Inf_Defuzz(Pos):
     weighted_sum = 0
     total_weight = 0
 
-    for rule, value in Outmem.Pos.items():
+    for rule, value in Pos.items():
         # A szabály súlya maga a szabály értéke
-        #weighted_sum += value * rule
-        #total_weight += value
+        weighted_sum += value * rule
+        total_weight += value
 
-        if value > 0:
-            area=area_trapezoid(2,value)
-            weighted_sum += area * rule
-            total_weight += area
-
-    #print(weighted_sum)
-    #print(total_weight)
+    print(weighted_sum)
+    print(total_weight)
 
     if total_weight != 0:
         defuzzified_value = weighted_sum / total_weight
         return defuzzified_value
     else:
         return None  
-    
-
 
 def Fuzzy_Control(e1, e2, Fuzzy_System):
     Fuzzyify(e1, e2, Fuzzy_System.Emem)
-    Match(Fuzzy_System.Emem, Fuzzy_System.Outmem)
-    return Inf_Defuzz(Fuzzy_System.Outmem)
-
+    Pos=Match(Fuzzy_System.Emem)
+    return Inf_Defuzz(Pos)
 
 # Teszt
 Fuzzy_System = Fuz_Sys()
 Fuzzy_Init(Fuzzy_System)
 e1 = 7
 e2 = 9
-#print("Fuzzy control:", Fuzzy_Control(e1, e2, Fuzzy_System))
-
+print("Fuzzy control:", Fuzzy_Control(e1, e2, Fuzzy_System))

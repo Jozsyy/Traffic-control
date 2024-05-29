@@ -19,8 +19,19 @@
 	<laneAreaDetector id="laneAreaDetector826606609#0_2" lanes="826606611_1 826606610_1 826606609#0_2" pos="0" endPos="30.4" file="output.xlsx" tl="cluster_1987096989_257998255_26003945_7717709774_#1more"/>
 	<laneAreaDetector id="laneAreaDetector23349324#4_0" lanes="23349324#3_0 23349324#4_0" pos="0" endPos="37.5" file="output.xlsx" tl="cluster_1987096989_257998255_26003945_7717709774_#1more"/>
 	<laneAreaDetector id="laneAreaDetector23349324#4_1" lanes="23349324#3_1 23349324#4_1" pos="0" endPos="37.5" file="output.xlsx" tl="cluster_1987096989_257998255_26003945_7717709774_#1more"/>
-	
+
 	<!-- Kozponti nagy keresztezodes -->
+	<laneAreaDetector id="laneAreaDetector23060091#1" lanes="4301039_2 23060091#1_0" pos="0" endPos="5.2" file="output.xlsx" tl="joinedS_cluster_1048507714_1528675438_248743350_248743351_#2more_cluster_248743346_3620518112_513613012_cluster_26003932_3620518113_3620518114"/>
+	<laneAreaDetector id="laneAreaDetector42956742#0_0" lanes="23113305_0 42956742#0_0" pos="0" endPos="28.7" file="output.xlsx" tl="joinedS_cluster_1048507714_1528675438_248743350_248743351_#2more_cluster_248743346_3620518112_513613012_cluster_26003932_3620518113_3620518114"/>
+	<laneAreaDetector id="laneAreaDetector23051421#0_0" lanes="23113305_1 23051421#0_0" pos="0" endPos="21.4" file="output.xlsx" tl="joinedS_cluster_1048507714_1528675438_248743350_248743351_#2more_cluster_248743346_3620518112_513613012_cluster_26003932_3620518113_3620518114"/>
+	<laneAreaDetector id="laneAreaDetector23051421#0_1" lanes="23113305_2 23051421#0_1" pos="0" endPos="21.4" file="output.xlsx" tl="joinedS_cluster_1048507714_1528675438_248743350_248743351_#2more_cluster_248743346_3620518112_513613012_cluster_26003932_3620518113_3620518114"/>
+	<laneAreaDetector id="laneAreaDetector-8516747#0_0" lanes="-8516747#2_0 -8516747#0_0" pos="0" endPos="20.7" file="output.xlsx" tl="joinedS_cluster_1048507714_1528675438_248743350_248743351_#2more_cluster_248743346_3620518112_513613012_cluster_26003932_3620518113_3620518114"/>
+	<laneAreaDetector id="laneAreaDetector-8516747#0_1" lanes="-8516747#2_1 -8516747#0_1" pos="0" endPos="20.7" file="output.xlsx" tl="joinedS_cluster_1048507714_1528675438_248743350_248743351_#2more_cluster_248743346_3620518112_513613012_cluster_26003932_3620518113_3620518114"/>
+	<laneAreaDetector id="laneAreaDetector23021229#0_0" lanes="23021229#0_0" pos="0" endPos="75.7" file="output.xlsx" tl="joinedS_cluster_1048507714_1528675438_248743350_248743351_#2more_cluster_248743346_3620518112_513613012_cluster_26003932_3620518113_3620518114"/>
+	<laneAreaDetector id="laneAreaDetector23021229#0_1" lanes="23021229#0_1" pos="0" endPos="75.7" file="output.xlsx" tl="joinedS_cluster_1048507714_1528675438_248743350_248743351_#2more_cluster_248743346_3620518112_513613012_cluster_26003932_3620518113_3620518114"/>
+	<laneAreaDetector id="laneAreaDetector42956741#1_0" lanes="4301039_0 42956741#1_0" pos="0" endPos="14.2" file="output.xlsx" tl="joinedS_cluster_1048507714_1528675438_248743350_248743351_#2more_cluster_248743346_3620518112_513613012_cluster_26003932_3620518113_3620518114"/>
+	<laneAreaDetector id="laneAreaDetector42956741#1_1" lanes="4301039_1 42956741#1_1" pos="0" endPos="14.2" file="output.xlsx" tl="joinedS_cluster_1048507714_1528675438_248743350_248743351_#2more_cluster_248743346_3620518112_513613012_cluster_26003932_3620518113_3620518114"/>
+	
 	
 	
 	<!-- Fortuna keresztezodes -->
