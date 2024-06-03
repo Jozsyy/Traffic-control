@@ -1,189 +1,164 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-class IN_MEM:
+class InputMembership:
+    def __init__(self, width1, center1, width2, center2):
+        self.width1 = width1
+        self.center1 = center1
+        self.dom1 = [0.0] * 5
+        self.width2 = width2
+        self.center2 = center2
+        self.dom2 = [0.0] * 5
+
+    def left_all(self, u, w, c):
+        if u < c:
+            return 1.0
+        else:
+            return max(0, (1 - (u - c) / w))
+
+    def right_all(self, u, w, c):
+        if u >= c:
+            return 1.0
+        else:
+            return max(0, (1 - (c - u) / w))
+
+    def triangle(self, u, w, c):
+        if u >= c:
+            return max(0, (1 - (u - c) / w))
+        else:
+            return max(0, (1 - (c - u) / w))
+
+    def fuzzify(self, U1, U2):
+        self.dom1[0] = self.left_all(U1, self.width1, self.center1[0])
+        self.dom2[0] = self.left_all(U2, self.width2, self.center2[0])
+        for i in range(1, 4):
+            self.dom1[i] = self.triangle(U1, self.width1, self.center1[i])
+            self.dom2[i] = self.triangle(U2, self.width2, self.center2[i])
+        self.dom1[4] = self.right_all(U1, self.width1, self.center1[4])
+        self.dom2[4] = self.right_all(U2, self.width2, self.center2[4])
+
+class OutputMembership:
     def __init__(self):
-        self.Width1 = 0.0
-        self.Center1 = [0.0] * 5
-        self.Dom1 = [0.0] * 5
-        self.Width2 = 0.0
-        self.Center2 = [0.0] * 5
-        self.Dom2 = [0.0] * 5
+        self.pos = {-4: 0, -2: 0, 0: 0, 2: 0, 4: 0}
 
-class OUT_MEM:
+    @staticmethod
+    def area_trapezoid(b, h):
+        #Haromszog magassaga = 1
+        #a-kisalap - kiszamitjuk
+        #b-nagyalap
+        #h-vagas amivel levagjuk a haromszog tetejet
+        a = (1 - h) * b
+        area = (a + b) * h / 2
+        return area
+
+    def inf_defuzz(self):
+        weighted_sum = 0
+        total_weight = 0
+
+        for rule, value in self.pos.items():
+            # A szabály súlya maga a szabály értéke
+            #weighted_sum += value * rule
+            #total_weight += value
+            if value > 0:
+                area = self.area_trapezoid(2, value)
+                weighted_sum += area * rule
+                total_weight += area
+
+        if total_weight != 0:
+            return weighted_sum / total_weight
+        else:
+            return None
+
+class FuzzySystem:
     def __init__(self):
-        self.Pos = {-4:0, -2:0, 0:0, 2:0, 4:0}
-        self.Width =[0.0] * 5
+        width1 = 5
+        width2 = 2
+        center1 = [0.0] * 5
+        center2 = [0.0] * 5
 
-class Fuz_Sys:
-    def __init__(self):
-        self.Emem = IN_MEM()
-        self.Outmem = OUT_MEM()
+        for i in range(0, 5):
+            center1[i] = 5 * i
+            center2[i] = 2 * i - 4
 
-def MAX(a,b):
-    if a>b:
-        return a
-    else:
-        return b
+        self.inmem = InputMembership(width1, center1, width2, center2)
+        self.outmem = OutputMembership()
 
-def MIN(a,b):
-    if a<b:
-        return a
-    else:
-        return b
-    
-def Fuzzy_Init(Fuzzy_System):
-    Fuzzy_System.Emem.Width1 = 5
-    Fuzzy_System.Emem.Width2 = 2
-    Fuzzy_System.Outmem.Width = 2
+    @staticmethod   #Nem fuggnek az osztaly peldanyaitol vagy osztaly belso allapotatol
+    def rules(i, j):    #i jeloli a sor hosszat, j pedig a valtozast
+        rules_matrix = [
+            [-4, -4, -2, 0, 2],
+            [-4, -2, 0, 0, 2],
+            [-2, 0, 2, 2, 4],
+            [0, 2, 2, 4, 4],
+            [2, 2, 4, 4, 4]
+        ]
+        return rules_matrix[i][j]
 
-    for i in range(0, 5):
-        Fuzzy_System.Emem.Center1[i]=5*i
-        Fuzzy_System.Emem.Center2[i]=2*(i)-4
+    def match(self):
+        for i in range(0, 5):
+            for j in range(0, 5):
+                if self.inmem.dom1[i] != 0 and self.inmem.dom2[j] != 0:
+                    rule = self.rules(i, j)
+                    value = min(self.inmem.dom1[i], self.inmem.dom2[j])
+                    self.outmem.pos[rule] = max(value, self.outmem.pos[rule])
 
-def LeftAll(u,w,c):
-    if u<c:
-        return 1.0
-    else:
-        return max(0,(1-(u-c)/w))
+    def fuzzy_control(self, e1, e2):
+        self.inmem.fuzzify(e1, e2)
+        self.match()
+        return self.outmem.inf_defuzz()
 
-def RightAll(u,w,c):
-    if u>=c:
-        return 1.0
-    else:
-        return max(0,(1-(c-u)/w))
-    
-def Triangle(u,w,c):
-    if u>=c:
-        return max(0,(1-(u-c)/w))
-    else:
-        return max(0,(1-(c-u)/w))
-    
-def Fuzzyify(U1, U2, Mem):
-    Mem.Dom1[0] = LeftAll(U1, Mem.Width1, Mem.Center1[0])
-    Mem.Dom2[0] = LeftAll(U2, Mem.Width2, Mem.Center2[0])
-    for i in range(1, 4):
-        Mem.Dom1[i] = Triangle(U1, Mem.Width1, Mem.Center1[i])
-        Mem.Dom2[i] = Triangle(U2, Mem.Width2, Mem.Center2[i])
-    Mem.Dom1[4] = RightAll(U1, Mem.Width1, Mem.Center1[4])
-    Mem.Dom2[4] = RightAll(U2, Mem.Width2, Mem.Center2[4])
-    #print(Mem.Dom1)
-    #print(Mem.Dom2)
+    def plot_input_membership_functions(self):
+        x = np.linspace(-10, 30, 500)
 
-def rules(i, j):    #i jeloli a sor hosszat, j pedig a valtozast
-    #i=0
-    if i==0 and j==0:
-        return -4
-    elif i==0 and j==1:
-        return -4
-    elif i==0 and j==2:
-        return -2
-    elif i==0 and j==3:
-        return 0
-    elif i==0 and j==4:
-        return 2
-    #i=1
-    elif i==1 and j==0:
-        return -4
-    elif i==1 and j==1:
-        return -2
-    elif i==1 and j==2:
-        return 0
-    elif i==1 and j==3:
-        return 0
-    elif i==1 and j==4:
-        return 2
-    #i=2
-    elif i==2 and j==0:
-        return -2
-    elif i==2 and j==1:
-        return 0
-    elif i==2 and j==2:
-        return 2
-    elif i==2 and j==3:
-        return 2
-    elif i==2 and j==4:
-        return 4
-    #i=3
-    elif i==3 and j==0:
-        return 0
-    elif i==3 and j==1:
-        return 2
-    elif i==3 and j==2:
-        return 2
-    elif i==3 and j==3:
-        return 4
-    elif i==3 and j==4:
-        return 4
-    #i=4
-    elif i==4 and j==0:
-        return 2
-    elif i==4 and j==1:
-        return 2
-    elif i==4 and j==2:
-        return 4
-    elif i==4 and j==3:
-        return 4
-    elif i==4 and j==4:
-        return 4
-    
+        fig, axs = plt.subplots(2, 1, figsize=(10, 10))
 
-def Match(Emem,Outmem):
-    for i in range(0,5):
-        for j in range(0,5):
-            if Emem.Dom1[i]!=0 and Emem.Dom2[j]!=0:
-                rule=rules(i,j)
-                value=min(Emem.Dom1[i], Emem.Dom2[j])     
-                Outmem.Pos[rule]=max(value,Outmem.Pos[rule])
+        val1=["NR", "R", "K", "H", "NH"]
+        for i in range(5):
+            y1 = [self.inmem.left_all(val, self.inmem.width1, self.inmem.center1[i]) if i == 0 else
+                  self.inmem.right_all(val, self.inmem.width1, self.inmem.center1[i]) if i == 4 else
+                  self.inmem.triangle(val, self.inmem.width1, self.inmem.center1[i]) for val in x]
+            axs[0].plot(x, y1, label=f'{val1[i]} = {self.inmem.center1[i]}')
 
-    #print("Pos="+str(Outmem.Pos))
+        axs[0].set_title('Tagsági függvények az 1. bemenetre')
+        axs[0].legend()
+        axs[0].grid(True)
 
-def area_trapezoid(b,h):
-    #Haromszog magassaga = 1
-    #a-kisalap - kiszamitjuk
-    #b-nagyalap
-    #h-vagas amivel levagjuk a haromszog tetejet
+        val2=["NCS", "CS", "NV", "N", "NN"]
+        for i in range(5):
+            y2 = [self.inmem.left_all(val, self.inmem.width2, self.inmem.center2[i]) if i == 0 else
+                  self.inmem.right_all(val, self.inmem.width2, self.inmem.center2[i]) if i == 4 else
+                  self.inmem.triangle(val, self.inmem.width2, self.inmem.center2[i]) for val in x]
+            axs[1].plot(x, y2, label=f'{val2[i]} = {self.inmem.center2[i]}')
 
-    a = (1-h)*b
-    area=(a+b)*h/2
-    return area
+        axs[1].set_title('Tagsági függvények a 2. bemenetre')
+        axs[1].legend()
+        axs[1].grid(True)
 
-#Sulyozott atlag
-def Inf_Defuzz(Outmem):
-    weighted_sum = 0
-    total_weight = 0
+        plt.tight_layout()
+        plt.show()
 
-    for rule, value in Outmem.Pos.items():
-        # A szabály súlya maga a szabály értéke
-        #weighted_sum += value * rule
-        #total_weight += value
+    def plot_output_membership_functions(self):
+        x = np.linspace(-10, 10, 500)
+        fig, ax = plt.subplots(figsize=(10, 5))
 
-        if value > 0:
-            area=area_trapezoid(2,value)
-            weighted_sum += area * rule
-            total_weight += area
+        val=["NCS", "CS", "NV", "N", "NN"]
+        i=0
+        for pos in self.outmem.pos.keys():
+            y = [self.inmem.left_all(val, 2, pos) if pos == -4 else
+                 self.inmem.right_all(val, 2, pos) if pos == 4 else
+                 self.inmem.triangle(val, 2, pos) for val in x]
+            ax.plot(x, y, label=f'{val[i]} = {pos}')
+            i += 1
 
-    #print(weighted_sum)
-    #print(total_weight)
+        ax.set_title('Kimeneti tagsági függvények')
+        ax.legend()
+        ax.grid(True)
 
-    if total_weight != 0:
-        defuzzified_value = weighted_sum / total_weight
-        return defuzzified_value
-    else:
-        return None  
-    
-
-
-def Fuzzy_Control(e1, e2, Fuzzy_System):
-    Fuzzyify(e1, e2, Fuzzy_System.Emem)
-    Match(Fuzzy_System.Emem, Fuzzy_System.Outmem)
-    return Inf_Defuzz(Fuzzy_System.Outmem)
-
+        plt.tight_layout()
+        plt.show()
 
 # Teszt
-Fuzzy_System = Fuz_Sys()
-Fuzzy_Init(Fuzzy_System)
-e1 = 7
-e2 = 9
-#print("Fuzzy control:", Fuzzy_Control(e1, e2, Fuzzy_System))
-
+#fuzzy_system = FuzzySystem()
+#print(fuzzy_system.fuzzy_control(e1=20, e2=3))
+#fuzzy_system.plot_input_membership_functions()
+#fuzzy_system.plot_output_membership_functions()

@@ -106,14 +106,13 @@ def sequence_control_ref(sequence):
 
         #Fuzzy control
         if step!=0:
-                Fuzzy_System = fz.Fuz_Sys()
-                fz.Fuzzy_Init(Fuzzy_System)
+                fuzzy_system = fz.FuzzySystem()
                 if sequence==1:
-                        fuzzy_output=fz.Fuzzy_Control(sequence1_cars, sequence1_change, Fuzzy_System)
+                        fuzzy_output=fuzzy_system.fuzzy_control(sequence1_cars, sequence1_change)
                 elif sequence==2:
-                        fuzzy_output=fz.Fuzzy_Control(sequence2_cars, sequence2_change, Fuzzy_System)
+                        fuzzy_output=fuzzy_system.fuzzy_control(sequence2_cars, sequence2_change)
                 else:
-                        fuzzy_output=fz.Fuzzy_Control(sequence3_cars, sequence3_change, Fuzzy_System)
+                        fuzzy_output=fuzzy_system.fuzzy_control(sequence3_cars, sequence3_change)
         else:
                 fuzzy_output=0
 
@@ -178,16 +177,15 @@ def sequence_control_fortuna(sequence_f):
 
         #Fuzzy control
         if step!=0:
-                Fuzzy_System = fz.Fuz_Sys()
-                fz.Fuzzy_Init(Fuzzy_System)
+                fuzzy_system = fz.FuzzySystem()
                 if sequence_f==1:
-                        fuzzy_output=fz.Fuzzy_Control(sequence1_cars_f, sequence1_change_f, Fuzzy_System)
+                        fuzzy_output=fuzzy_system.fuzzy_control(sequence1_cars_f, sequence1_change_f)
                 elif sequence_f==2:
-                        fuzzy_output=fz.Fuzzy_Control(sequence2_cars_f, sequence2_change_f, Fuzzy_System)
+                        fuzzy_output=fuzzy_system.fuzzy_control(sequence2_cars_f, sequence2_change_f)
                 elif sequence_f==3:
-                        fuzzy_output=fz.Fuzzy_Control(sequence3_cars_f, sequence3_change_f, Fuzzy_System)
+                        fuzzy_output=fuzzy_system.fuzzy_control(sequence3_cars_f, sequence3_change_f)
                 else:
-                        fuzzy_output=fz.Fuzzy_Control(sequence4_cars_f, sequence4_change_f, Fuzzy_System)
+                        fuzzy_output=fuzzy_system.fuzzy_control(sequence4_cars_f, sequence4_change_f)
         else:
                 fuzzy_output=0
 
@@ -252,16 +250,15 @@ def sequence_control_kozpont(sequence_k):
 
         #Fuzzy control
         if step!=0:
-                Fuzzy_System = fz.Fuz_Sys()
-                fz.Fuzzy_Init(Fuzzy_System)
+                fuzzy_system = fz.FuzzySystem()
                 if sequence_f==1:
-                        fuzzy_output=fz.Fuzzy_Control(sequence1_cars_k, sequence1_change_k, Fuzzy_System)
+                        fuzzy_output=fuzzy_system.fuzzy_control(sequence1_cars_k, sequence1_change_k)
                 elif sequence_f==2:
-                        fuzzy_output=fz.Fuzzy_Control(sequence2_cars_k, sequence2_change_k, Fuzzy_System)
+                        fuzzy_output=fuzzy_system.fuzzy_control(sequence2_cars_k, sequence2_change_k)
                 elif sequence_f==3:
-                        fuzzy_output=fz.Fuzzy_Control(sequence3_cars_k, sequence3_change_k, Fuzzy_System)
+                        fuzzy_output=fuzzy_system.fuzzy_control(sequence3_cars_k, sequence3_change_k)
                 else:
-                        fuzzy_output=fz.Fuzzy_Control(sequence4_cars_k, sequence4_change_k, Fuzzy_System)
+                        fuzzy_output=fuzzy_system.fuzzy_control(sequence4_cars_k, sequence4_change_k)
         else: 
                 fuzzy_output=0
 

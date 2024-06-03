@@ -1,0 +1,38 @@
+@startuml
+
+class InputMembership {
+    -width1: float
+    -center1: List[float]
+    -dom1: List[float]
+    -width2: float
+    -center2: List[float]
+    -dom2: List[float]
+    +__init__(width1: float, center1: List[float], width2: float, center2: List[float])
+    +left_all(u: float, w: float, c: float): float
+    +right_all(u: float, w: float, c: float): float
+    +triangle(u: float, w: float, c: float): float
+    +fuzzify(U1: float, U2: float): void
+}
+
+class OutputMembership {
+    -pos: Dict[int, float]
+    +__init__(): void
+    +area_trapezoid(b: float, h: float): float
+    +inf_defuzz(): float
+}
+
+class FuzzySystem {
+    -inmem: InputMembership
+    -outmem: OutputMembership
+    +__init__(): void
+    +rules(i: int, j: int): int
+    +match(): void
+    +fuzzy_control(e1: float, e2: float): float
+    +plot_membership_functions(): void
+    +plot_output_membership_functions(): void
+}
+
+FuzzySystem --> InputMembership : uses
+FuzzySystem --> OutputMembership : uses
+
+@enduml
