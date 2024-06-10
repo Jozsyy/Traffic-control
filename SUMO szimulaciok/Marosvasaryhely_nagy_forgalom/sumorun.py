@@ -4,16 +4,9 @@ import fuzzy as fz
 sumoCmd = ["sumo-gui", "-c", "osm.sumocfg"]
 traci.start(sumoCmd)
 
-packVehicleData = []
-packTLSData = []
-packBigData = []
 step=0
 
-traffic_light_ref="cluster_1987096989_257998255_26003945_7717709774_#1more"
-traffic_ligt_kozpont="joinedS_cluster_1048507714_1528675438_248743350_248743351_#2more_cluster_248743346_3620518112_513613012_cluster_26003932_3620518113_3620518114"
-traffic_light_Fortuna="cluster_249821091_249821092_249821094_26003449_#13more"
-
-#Ref
+### Reformatus kollegium utcai keresztezodes
 sequence=1
 sequence_time1=50
 sequence_time2=50
@@ -25,9 +18,18 @@ next_sequence=0
 sequence1_cars_prev=0
 sequence2_cars_prev=0
 sequence3_cars_prev=0
+traffic_light_ref="cluster_1987096989_257998255_26003945_7717709774_#1more"
+detector1_0="laneAreaDetector-43791591#1_0"
+detector1_1="laneAreaDetector-43791591#1_1"
+detector1_2="laneAreaDetector-43791591#1_2"
+detector2_0="laneAreaDetector-954637017#1_0"
+detector3_0="laneAreaDetector826606609#0_0"
+detector3_1="laneAreaDetector826606609#0_1"
+detector3_2="laneAreaDetector826606609#0_2"
+detector4_0="laneAreaDetector23349324#4_0"
+detector4_1="laneAreaDetector23349324#4_1"
 
-
-#Fortuna
+### Fortuna keresztezodes
 sequence_f=4
 sequence_time1_f=40
 sequence_time2_f=40
@@ -42,8 +44,21 @@ sequence1_cars_prev_f=0
 sequence2_cars_prev_f=0
 sequence3_cars_prev_f=0
 sequence4_cars_prev_f=0
+traffic_light_Fortuna="cluster_249821091_249821092_249821094_26003449_#13more"
+detector1_0_f="laneAreaDetector188302703#1_0"
+detector1_1_f="laneAreaDetector188302703#1_1"
+detector1_2_f="laneAreaDetector188302703#1_2"
+detector2_0_f="laneAreaDetector-869087990_0"
+detector2_1_f="laneAreaDetector-869087990_1"
+detector3_0_f="laneAreaDetector695614758_0"
+detector3_1_f="laneAreaDetector695614758_1"
+detector3_2_f="laneAreaDetector695614758_2"
+detector4_0_f="laneAreaDetector862984187_0"
+detector4_1_f="laneAreaDetector862984187_1"
+detector4_2_f="laneAreaDetector862984187_2"
+detector4_3_f="laneAreaDetector862984187_3"
 
-#Kozpont
+### Kozpont keresztezodes
 sequence_k=2
 sequence_time1_k=40
 sequence_time2_k=40
@@ -58,6 +73,17 @@ sequence1_cars_prev_k=0
 sequence2_cars_prev_k=0
 sequence3_cars_prev_k=0
 sequence4_cars_prev_k=0
+traffic_ligt_kozpont="joinedS_cluster_1048507714_1528675438_248743350_248743351_#2more_cluster_248743346_3620518112_513613012_cluster_26003932_3620518113_3620518114"
+detector4_2_k="laneAreaDetector23060091#1"
+detector1_0_k="laneAreaDetector42956742#0_0"
+detector1_1_k="laneAreaDetector23051421#0_0"
+detector1_2_k="laneAreaDetector23051421#0_1"
+detector2_0_k="laneAreaDetector-8516747#0_0"
+detector2_1_k="laneAreaDetector-8516747#0_1"
+detector3_0_k="laneAreaDetector23021229#0_0"
+detector3_1_k="laneAreaDetector23021229#0_1"
+detector4_0_k="laneAreaDetector42956741#1_0"
+detector4_1_k="laneAreaDetector42956741#1_1"
 
 def sequence_control_ref(sequence):
         global sequence1_cars_prev
@@ -280,46 +306,10 @@ while traci.simulation.getMinExpectedNumber()>0:
         #trafficlights=traci.trafficlight.getIDList()
         if step>20:
                 traci.vehicle.setSpeed("veh123",12.5)
-        
-        ### Reformatus kollegium utca
-        detector1_0="laneAreaDetector-43791591#1_0"
-        detector1_1="laneAreaDetector-43791591#1_1"
-        detector1_2="laneAreaDetector-43791591#1_2"
-        detector2_0="laneAreaDetector-954637017#1_0"
-        detector3_0="laneAreaDetector826606609#0_0"
-        detector3_1="laneAreaDetector826606609#0_1"
-        detector3_2="laneAreaDetector826606609#0_2"
-        detector4_0="laneAreaDetector23349324#4_0"
-        detector4_1="laneAreaDetector23349324#4_1"
 
-        ### Fortuna keresztezodes
-        detector1_0_f="laneAreaDetector188302703#1_0"
-        detector1_1_f="laneAreaDetector188302703#1_1"
-        detector1_2_f="laneAreaDetector188302703#1_2"
-        detector2_0_f="laneAreaDetector-869087990_0"
-        detector2_1_f="laneAreaDetector-869087990_1"
-        detector3_0_f="laneAreaDetector695614758_0"
-        detector3_1_f="laneAreaDetector695614758_1"
-        detector3_2_f="laneAreaDetector695614758_2"
-        detector4_0_f="laneAreaDetector862984187_0"
-        detector4_1_f="laneAreaDetector862984187_1"
-        detector4_2_f="laneAreaDetector862984187_2"
-        detector4_3_f="laneAreaDetector862984187_3"
-
-        ### Kozpont keresztezodes
-        detector4_2_k="laneAreaDetector23060091#1"
-        detector1_0_k="laneAreaDetector42956742#0_0"
-        detector1_1_k="laneAreaDetector23051421#0_0"
-        detector1_2_k="laneAreaDetector23051421#0_1"
-        detector2_0_k="laneAreaDetector-8516747#0_0"
-        detector2_1_k="laneAreaDetector-8516747#0_1"
-        detector3_0_k="laneAreaDetector23021229#0_0"
-        detector3_1_k="laneAreaDetector23021229#0_1"
-        detector4_0_k="laneAreaDetector42956741#1_0"
-        detector4_1_k="laneAreaDetector42956741#1_1"
-        
+        #Reformatus kollegium        
         if step==next_sequence and sequence==1:
-                traci.trafficlight.setRedYellowGreenState(traffic_light_ref, "GGGrrrrrrrGGGrrrrrr")
+                traci.trafficlight.setRedYellowGreenState(traffic_light_ref, "gggrrrrrrrgggrrrrrr")
                 
                 delta_t1=sequence_control_ref(sequence)
                 print(delta_t1)
@@ -371,7 +361,7 @@ while traci.simulation.getMinExpectedNumber()>0:
                 
 
         elif step==next_sequence and sequence==3:
-                traci.trafficlight.setRedYellowGreenState(traffic_light_ref, "Grrrrrrrrrrrrrrgggg")
+                traci.trafficlight.setRedYellowGreenState(traffic_light_ref, "grrrrrrrrrrrrrrgggg")
                 delta_t3=sequence_control_ref(sequence)
                 print(delta_t3)
                 sequence_time3+=delta_t3  #meddig tartson a zold jelzes
@@ -394,8 +384,7 @@ while traci.simulation.getMinExpectedNumber()>0:
                 print(sequence_time2)
                 print(sequence_time3)
 
-
-
+        ### Fortuna
         if step==next_sequence_f and sequence_f==1:
                 traci.trafficlight.setRedYellowGreenState(traffic_light_Fortuna, "rrrrgggrrrrgggr") #foutrol elore
                 delta_t1_f=sequence_control_fortuna(sequence_f)
@@ -513,6 +502,7 @@ while traci.simulation.getMinExpectedNumber()>0:
                 print(sequence_time4_f)
                 '''
 
+        ### Kozpont
         if step==next_sequence_k and sequence_k==1:
                 traci.trafficlight.setRedYellowGreenState(traffic_ligt_kozpont, "rggrrrrrrrgggrrrrrrgrrgggg") #Dozsa Gyorgy elore
                 delta_t1_k=sequence_control_kozpont(sequence_k)
@@ -629,23 +619,6 @@ while traci.simulation.getMinExpectedNumber()>0:
                 print(sequence_time3_k)
                 print(sequence_time4_k)
                 '''
-        
-        #Szekvenciak - Ref kollegium
-        #traci.trafficlight.setRedYellowGreenState(traffic_light_ref, "GGGrrrrrrrGGGrrrrrr")
-        #traci.trafficlight.setRedYellowGreenState(traffic_light_ref, "Grrrrrrrrrrrrrrgggg")
-        #traci.trafficlight.setRedYellowGreenState(traffic_light_ref, "rrrgggggggrrrggrrrr")
-       
-        #Szekvenciak - kozpont
-        #traci.trafficlight.setRedYellowGreenState(traffic_ligt_kozpont, "rggrrrrrrrgggrrrrrrgrrgggg") #Dozsa Gyorgy elore
-        #traci.trafficlight.setRedYellowGreenState(traffic_ligt_kozpont, "rrrgggrrrrrrrgggrrrrgggggr") #Dozsa Gorgy balra
-        #traci.trafficlight.setRedYellowGreenState(traffic_ligt_kozpont, "rrrrrgggrrrrrrrggrrrgggggg")  #Hosszzu utca elore, jobbra
-        #traci.trafficlight.setRedYellowGreenState(traffic_ligt_kozpont, "grrrrrrrgggrrrrrrggggggggg")   ##Hosszu utca balra
-
-        #Szekvenciak - Fortuna
-        #traci.trafficlight.setRedYellowGreenState(traffic_light_Fortuna, "rrrrgggrrrrgggr") #foutrol elore
-        #traci.trafficlight.setRedYellowGreenState(traffic_light_Fortuna, "grrrrrrggrrrrrg") #foutrol balra
-        #traci.trafficlight.setRedYellowGreenState(traffic_light_Fortuna, "gggrrrrrggrrrrr") #mellekutrol elore
-        #traci.trafficlight.setRedYellowGreenState(traffic_light_Fortuna, "rrrggrrrrrggrrr") #mellekutrol balra
 
         step += 1
 traci.close()

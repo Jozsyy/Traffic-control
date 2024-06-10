@@ -2,7 +2,7 @@ clear all, close all, clc;
 
 %[0, 1.5, 7.4, 0.964, 14.8, 0, 22.2, 0, 29.6, 0, 37, 0, 44.4, 0, 51.8, 0, 59.2, 0, 66.6, 0]
 %[0, 1.5, 1.9, 0.964, 10, 0, 15, 0, 20, 0, 30, 0, 40, 0, 50, 0, 70, 0, 80, 0]
-[t,y]=ode45(@fuggv,[0,100],[0, 0, 7.4, 0, 14.8, 0, 22.2, 0, 29.6, 0, 37, 0, 44.4, 0, 51.8, 0, 59.2, 0, 66.6, 0]);
+[t,y]=ode45(@fuggv,[0,30],[0, 0, 7.4, 0, 14.8, 0, 22.2, 0, 29.6, 0, 37, 0, 44.4, 0, 51.8, 0, 59.2, 0, 66.6, 0]);
 
 figure(1), plot(t,y(:,1),t,y(:,3),t,y(:,5),t,y(:,7),t,y(:,9),t,y(:,11),t,y(:,13),t,y(:,15),t,y(:,17),t,y(:,19)); grid
 xlabel("Idő (s)"), ylabel("Pozició (m)")
@@ -107,26 +107,7 @@ function vs=V(delta_xn)
     vs=v1+v2*tanh(c1*(delta_xn-lc)-c2);
 end
 
-function a = gyorsulasFuggveny(t)
-    t_novekvo = 15; % Az idő, amíg a gyorsulás növekszik (másodpercben)
-    
-    % Gyorsulás növekedése a megadott időig
-    if t <= t_novekvo-6
-        a = 0.1 + 0.01*t % Példa gyorsulásfüggvény (itt 0.01 a növekedés sebessége)
-    elseif t>t_novekvo-6 & t<t_novekvo
-        a = 0.15 - 0.01*t
-    else
-        a = 0; % A gyorsulás nullává válik a megadott idő után
-    end
-end
-
-function a = accelerationf(t)
-    a=(1/2)^t;
-end
-
-
 function a = exponencialisCsokkeno(t)
-    % A függvény paraméterei
     kezdoErtek = 6; % Kezdeti érték
     csokkenesRata = 0.4; % Csökkenési arány
     
