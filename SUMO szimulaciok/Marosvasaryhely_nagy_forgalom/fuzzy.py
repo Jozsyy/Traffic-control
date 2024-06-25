@@ -110,7 +110,7 @@ class FuzzySystem:
     def plot_input_membership_functions(self):
         x = np.linspace(-10, 30, 500)
 
-        fig, axs = plt.subplots(2, 1, figsize=(10, 10))
+        fig, axs = plt.subplots(2, 1, figsize=(12, 8))
 
         val1=["NR", "R", "K", "H", "NH"]
         for i in range(5):
@@ -122,6 +122,7 @@ class FuzzySystem:
         axs[0].set_title('Tagsági függvények az 1. bemenetre')
         axs[0].legend()
         axs[0].grid(True)
+        axs[0].set_xlabel("Járművek száma", loc="right")
 
         val2=["NCS", "CS", "NV", "N", "NN"]
         for i in range(5):
@@ -133,7 +134,8 @@ class FuzzySystem:
         axs[1].set_title('Tagsági függvények a 2. bemenetre')
         axs[1].legend()
         axs[1].grid(True)
-
+        axs[1].set_xlabel("Járművek száma", loc="right")
+        
         plt.tight_layout()
         plt.show()
 
@@ -154,11 +156,82 @@ class FuzzySystem:
         ax.legend()
         ax.grid(True)
 
+        plt.xlabel("Járművek száma", loc="right")
         plt.tight_layout()
         plt.show()
 
+    def plot_input_rule_cut_membership_functions(self, input_values, input_points):
+        x = np.linspace(-10, 30, 500)
+        
+        fig, axs = plt.subplots(2, 1, figsize=(12, 8))
+
+        val1=["NR", "R", "K", "H", "NH"]
+        for i in range(5):
+            y1 = [self.inmem.left_all(val, self.inmem.width1, self.inmem.center1[i]) if i == 0 else
+                self.inmem.right_all(val, self.inmem.width1, self.inmem.center1[i]) if i == 4 else
+                self.inmem.triangle(val, self.inmem.width1, self.inmem.center1[i]) for val in x]
+            cut_y1 = [min(y1_val, input_values[0][i]) for y1_val in y1]
+            axs[0].plot(x, y1, label=f'{val1[i]} = {self.inmem.center1[i]}')
+            axs[0].fill_between(x, cut_y1, color='black', alpha=0.5)
+        
+        axs[0].axvline(input_points[0], color='red', linestyle='--', linewidth=1)
+        axs[0].set_title('Levágott tagsági függvények az 1. bemenetre')
+        axs[0].legend()
+        axs[0].grid(True)
+        axs[0].set_xlabel("Járművek száma", loc="right")
+
+        val2=["NCS", "CS", "NV", "N", "NN"]
+        for i in range(5):
+            y2 = [self.inmem.left_all(val, self.inmem.width2, self.inmem.center2[i]) if i == 0 else
+                self.inmem.right_all(val, self.inmem.width2, self.inmem.center2[i]) if i == 4 else
+                self.inmem.triangle(val, self.inmem.width2, self.inmem.center2[i]) for val in x]
+            cut_y2 = [min(y2_val, input_values[1][i]) for y2_val in y2]
+            axs[1].plot(x, y2, label=f'{val2[i]} = {self.inmem.center2[i]}')
+            axs[1].fill_between(x, cut_y2, color='black', alpha=0.5)
+        
+        axs[1].axvline(input_points[1], color='red', linestyle='--', linewidth=1)
+        axs[1].set_title('Levágott tagsági függvények a 2. bemenetre')
+        axs[1].legend()
+        axs[1].grid(True)
+        axs[1].set_xlabel("Járművek száma", loc="right")
+
+        plt.tight_layout()
+        plt.show()
+
+    def plot_output_rule_cut_membership_functions(self):
+        x = np.linspace(-10, 10, 500)
+        
+        fig, ax = plt.subplots(figsize=(10, 5))
+
+        val = ["NCS", "CS", "NV", "N", "NN"]
+        i = 0
+        for pos, dom_value in self.outmem.pos.items():
+            y = [self.inmem.left_all(val, 2, pos) if pos == -4 else
+                self.inmem.right_all(val, 2, pos) if pos == 4 else
+                self.inmem.triangle(val, 2, pos) for val in x]
+            cut_y = [min(y_val, dom_value) for y_val in y]
+            ax.plot(x, y, label=f'{val[i]} = {pos}')
+            ax.fill_between(x, cut_y, color='black', alpha=0.5)
+            i += 1
+
+        ax.set_title('Levágott kimeneti tagsági függvények')
+        ax.legend()
+        ax.grid(True)
+
+        plt.xlabel("Járművek száma", loc="right")
+        plt.tight_layout()
+        plt.show()
+
+'''
 # Teszt
-#fuzzy_system = FuzzySystem()
-#print(fuzzy_system.fuzzy_control(e1=20, e2=3))
-#fuzzy_system.plot_input_membership_functions()
-#fuzzy_system.plot_output_membership_functions()
+fuzzy_system = FuzzySystem()
+e1=13
+e2=-2
+print(fuzzy_system.fuzzy_control(e1, e2))
+fuzzy_system.plot_input_membership_functions()
+fuzzy_system.plot_output_membership_functions()
+input_values = (fuzzy_system.inmem.dom1, fuzzy_system.inmem.dom2)
+input_points = (e1,e2)
+fuzzy_system.plot_input_rule_cut_membership_functions(input_values, input_points)
+fuzzy_system.plot_output_rule_cut_membership_functions()
+'''

@@ -1,16 +1,25 @@
 import traci
 import fuzzy as fz
+import numpy as np
 
 sumoCmd = ["sumo-gui", "-c", "osm.sumocfg"]
 traci.start(sumoCmd)
 
 step=0
+kozpont=0
+refo=0
+fortuna=0
+
+fortuna_v=[]
+kozpont_v=[]
+refo_v=[]
+sequence_time_max=50
 
 ### Reformatus kollegium utcai keresztezodes
 sequence=1
-sequence_time1=50
-sequence_time2=50
-sequence_time3=50
+sequence_time1=30
+sequence_time2=30
+sequence_time3=30
 delta_t1=0
 delta_t2=0
 delta_t3=0
@@ -28,13 +37,22 @@ detector3_1="laneAreaDetector826606609#0_1"
 detector3_2="laneAreaDetector826606609#0_2"
 detector4_0="laneAreaDetector23349324#4_0"
 detector4_1="laneAreaDetector23349324#4_1"
+lane1_0_prev=0
+lane1_1_prev=0
+lane1_2_prev=0
+lane2_0_prev=0
+lane3_0_prev=0
+lane3_1_prev=0
+lane3_2_prev=0
+lane4_0_prev=0
+lane4_1_prev=0
 
 ### Fortuna keresztezodes
 sequence_f=4
-sequence_time1_f=40
-sequence_time2_f=40
-sequence_time3_f=40
-sequence_time4_f=40
+sequence_time1_f=25
+sequence_time2_f=25
+sequence_time3_f=25
+sequence_time4_f=25
 delta_t1_f=0
 delta_t2_f=0
 delta_t3_f=0
@@ -57,13 +75,25 @@ detector4_0_f="laneAreaDetector862984187_0"
 detector4_1_f="laneAreaDetector862984187_1"
 detector4_2_f="laneAreaDetector862984187_2"
 detector4_3_f="laneAreaDetector862984187_3"
+lane1_0_f_prev=0
+lane1_1_f_prev=0
+lane1_2_f_prev=0
+lane2_0_f_prev=0
+lane2_1_f_prev=0
+lane3_0_f_prev=0
+lane3_1_f_prev=0
+lane3_2_f_prev=0
+lane4_0_f_prev=0
+lane4_1_f_prev=0
+lane4_2_f_prev=0
+lane4_3_f_prev=0
 
 ### Kozpont keresztezodes
 sequence_k=2
-sequence_time1_k=40
-sequence_time2_k=40
-sequence_time3_k=40
-sequence_time4_k=40
+sequence_time1_k=25
+sequence_time2_k=25
+sequence_time3_k=25
+sequence_time4_k=25
 delta_t1_k=0
 delta_t2_k=0
 delta_t3_k=0
@@ -84,6 +114,16 @@ detector3_0_k="laneAreaDetector23021229#0_0"
 detector3_1_k="laneAreaDetector23021229#0_1"
 detector4_0_k="laneAreaDetector42956741#1_0"
 detector4_1_k="laneAreaDetector42956741#1_1"
+lane1_0_k_prev=0
+lane1_1_k_prev=0
+lane1_2_k_prev=0
+lane2_0_k_prev=0
+lane2_1_k_prev=0
+lane3_0_k_prev=0
+lane3_1_k_prev=0
+lane4_0_k_prev=0
+lane4_1_k_prev=0
+lane4_2_k_prev=0
 
 def sequence_control_ref(sequence):
         global sequence1_cars_prev
@@ -101,7 +141,7 @@ def sequence_control_ref(sequence):
         lane4_0=traci.lanearea.getLastStepVehicleNumber(detector4_0)
         lane4_1=traci.lanearea.getLastStepVehicleNumber(detector4_1)
 
-        
+        '''
         print("Cars waiting in lane 1_0:"+str(lane1_0))
         print("Cars waiting in lane 1_1:"+str(lane1_1))
         print("Cars waiting in lane 1_2:"+str(lane1_2))
@@ -112,10 +152,10 @@ def sequence_control_ref(sequence):
         print("Cars waiting in lane 4_0:"+str(lane4_0))
         print("Cars waiting in lane 4_1:"+str(lane4_1))
          
-
+        
         waiting_cars=lane1_0+lane1_1+lane1_2+lane2_0+lane3_0+lane3_1+lane3_2+lane4_0+lane4_1
         print("All waiting cars:"+str(waiting_cars))
-        
+        '''
         sequence1_cars=lane1_0+lane1_1+lane3_0+lane3_1
         sequence2_cars=lane1_2+lane2_0+lane3_2
         sequence3_cars=lane4_0+lane4_1
@@ -124,11 +164,11 @@ def sequence_control_ref(sequence):
         sequence2_change=sequence2_cars-sequence2_cars_prev
         sequence3_change=sequence3_cars-sequence3_cars_prev
 
-        
+        '''
         print(f"Sequence 1 change:{sequence1_change}")
         print(f"Sequence 2 change:{sequence2_change}")
         print(f"Sequence 3 change:{sequence3_change}")
-        
+        '''
 
         #Fuzzy control
         if step!=0:
@@ -147,7 +187,7 @@ def sequence_control_ref(sequence):
         sequence2_cars_prev=sequence2_cars
         sequence3_cars_prev=sequence3_cars
 
-        print(f"Fuzzy output Ref: {fuzzy_output}")
+        #print(f"Fuzzy output Ref: {fuzzy_output}")
         return round(fuzzy_output,0)
 
 def sequence_control_fortuna(sequence_f):
@@ -304,108 +344,179 @@ while traci.simulation.getMinExpectedNumber()>0:
 
         #vehicles=traci.vehicle.getIDList()
         #trafficlights=traci.trafficlight.getIDList()
-        if step>20:
-                traci.vehicle.setSpeed("veh123",12.5)
+        #if step>20:
+        #        traci.vehicle.setSpeed("veh123",12.5)
 
         #Reformatus kollegium        
         if step==next_sequence and sequence==1:
                 traci.trafficlight.setRedYellowGreenState(traffic_light_ref, "gggrrrrrrrgggrrrrrr")
                 
                 delta_t1=sequence_control_ref(sequence)
-                print(delta_t1)
+                #print(delta_t1)
 
+                if sequence_time1+delta_t1<=0:
+                        delta_t1=-sequence_time1+1      #legalabb 1 mp-t minimum tart
+                elif delta_t1>0 and sequence_time1+delta_t1>=sequence_time_max:
+                        delta_t1=0
                 sequence_time1+=delta_t1  #meddig tartson a zold jelzes
 
                 #fuzzy altal meghatarozott +- ido levonasa/hozzaadasa a tobbi zold jelzeshez
                 if delta_t1!=0 and delta_t1%2==0:
-                        sequence_time2-=delta_t1/2
-                        sequence_time3-=delta_t1/2
+                        if sequence_time2 >= delta_t1/2:
+                                sequence_time2-=delta_t1/2
+                        else:
+                                sequence_time1-=delta_t1/2
+                        if sequence_time3 >= delta_t1/2:
+                                sequence_time3-=delta_t1/2
+                        else:
+                                sequence_time1-=delta_t1/2
                 elif delta_t1!=0 and delta_t1%2!=0:
-                        sequence_time2-=round(delta_t1/2,0)
+                        if sequence_time2 >= round(delta_t1/2,0):
+                                sequence_time2-=round(delta_t1/2,0)
+                        else:
+                                sequence_time1-=round(delta_t1/2,0)
                         delta_t1-=round(delta_t1/2,0)
-                        sequence_time3-=delta_t1
+                        if sequence_time3 >= delta_t1:
+                                sequence_time3-=delta_t1
+                        else:
+                                sequence_time1-=round(delta_t1/2,0)
 
                 next_sequence+=sequence_time1
-                sequence+=1
-                
+                sequence=2
+                '''
                 print("Time:")
                 print(sequence_time1+sequence_time2+sequence_time3)
                 print(sequence_time1)
                 print(sequence_time2)
                 print(sequence_time3)
-                
+                '''
 
         elif step==next_sequence and sequence==2:
                 traci.trafficlight.setRedYellowGreenState(traffic_light_ref, "rrrgggggggrrrggrrrr")
                 delta_t2=sequence_control_ref(sequence)
-                print(delta_t2)
+                #print(delta_t2)
+
+                if sequence_time2+delta_t2<=0:
+                        delta_t2=-sequence_time2+1
+                elif delta_t2>0 and sequence_time2+delta_t2>=sequence_time_max:
+                        delta_t2=0
                 sequence_time2+=delta_t2  #meddig tartson a zold jelzes
 
                 #fuzzy altal meghatarozott +- ido levonasa/hozzaadasa a tobbi zold jelzeshez
                 if delta_t2!=0 and delta_t2%2==0:
-                        sequence_time3-=delta_t2/2
-                        sequence_time1-=delta_t2/2
+                        if sequence_time3 >= delta_t2/2:
+                                sequence_time3-=delta_t2/2
+                        else:
+                                sequence_time2-=delta_t2/2
+                        if sequence_time1 >= delta_t2/2:
+                                sequence_time1-=delta_t2/2
+                        else:
+                                sequence_time2-=delta_t2/2
                 elif delta_t2!=0 and delta_t2%2!=0:
-                        sequence_time3-=round(delta_t2/2,0)
+                        if sequence_time3 >= round(delta_t2/2,0):
+                                sequence_time3-=round(delta_t2/2,0)
+                        else:
+                                sequence_time2-=round(delta_t2/2,0)
                         delta_t2-=round(delta_t2/2,0)
-                        sequence_time1-=delta_t2
+                        if sequence_time1 >= delta_t2:
+                                sequence_time1-=delta_t2
+                        else:
+                                sequence_time2-=delta_t2
                 
                 next_sequence+=sequence_time2
-                sequence+=1
-                
+                sequence=3
+                '''
                 print("Time:")
                 print(sequence_time1+sequence_time2+sequence_time3)
                 print(sequence_time1)
                 print(sequence_time2)
                 print(sequence_time3)
-                
+                '''
 
         elif step==next_sequence and sequence==3:
                 traci.trafficlight.setRedYellowGreenState(traffic_light_ref, "grrrrrrrrrrrrrrgggg")
                 delta_t3=sequence_control_ref(sequence)
-                print(delta_t3)
+                #print(delta_t3)
+
+                if sequence_time3+delta_t3<=0:
+                        delta_t3=-sequence_time3+1
+                elif delta_t3>0 and sequence_time3+delta_t3>=sequence_time_max:
+                        delta_t3=0
                 sequence_time3+=delta_t3  #meddig tartson a zold jelzes
 
                 #fuzzy altal meghatarozott +- ido levonasa/hozzaadasa a tobbi zold jelzeshez
                 if delta_t3!=0 and delta_t3%2==0:
-                        sequence_time1-=delta_t3/2
-                        sequence_time2-=delta_t3/2
+                        if sequence_time1 >= delta_t3/2:
+                                sequence_time1-=delta_t3/2
+                        else:
+                                sequence_time3-=delta_t3/2
+                        if sequence_time2 >= delta_t3/2:
+                                sequence_time2-=delta_t3/2
+                        else:
+                                sequence_time3-=delta_t3/2
                 elif delta_t3!=0 and delta_t3%2!=0:
-                        sequence_time1-=round(delta_t3/2,0)
+                        if sequence_time1 >= round(delta_t3/2,0):
+                                sequence_time1-=round(delta_t3/2,0)
+                        else:
+                                sequence_time3-=round(delta_t3/2,0)
                         delta_t3-=round(delta_t3/2,0)
-                        sequence_time2-=delta_t3
+                        if sequence_time2 >= delta_t3:
+                                sequence_time2-=delta_t3
+                        else:
+                                sequence_time3-=delta_t3
 
                 next_sequence+=sequence_time3
                 sequence=1
-                
+                '''
                 print("Time:")
                 print(sequence_time1+sequence_time2+sequence_time3)
                 print(sequence_time1)
                 print(sequence_time2)
                 print(sequence_time3)
-
+                '''
         ### Fortuna
         if step==next_sequence_f and sequence_f==1:
                 traci.trafficlight.setRedYellowGreenState(traffic_light_Fortuna, "rrrrgggrrrrgggr") #foutrol elore
                 delta_t1_f=sequence_control_fortuna(sequence_f)
                 #print("DELTA1:"+str(delta_t1_f))
                        
+                if sequence_time1_f+delta_t1_f<=0:
+                        delta_t1_f=-sequence_time1_f+1
+                elif delta_t1_f>0 and sequence_time1_f+delta_t1_f>=sequence_time_max:
+                        delta_t1_f=0
                 sequence_time1_f+=delta_t1_f  #meddig tartson a zold jelzes
 
                 #fuzzy altal meghatarozott +- ido levonasa/hozzaadasa a tobbi zold jelzeshez
                 if delta_t1_f!=0 and delta_t1_f%3==0:
-                        sequence_time2_f-=delta_t1_f/3
-                        sequence_time3_f-=delta_t1_f/3
-                        sequence_time4_f-=delta_t1_f/3
+                        if sequence_time2_f >= delta_t1_f/3:
+                                sequence_time2_f-=delta_t1_f/3
+                        else:
+                                sequence_time1_f-=delta_t1_f/3
+                        if sequence_time3_f >= delta_t1_f/3:
+                                sequence_time3_f-=delta_t1_f/3
+                        else:
+                                sequence_time1_f-=delta_t1_f/3
+                        if sequence_time4_f >= delta_t1_f/3:
+                                sequence_time4_f-=delta_t1_f/3
+                        else:
+                                sequence_time1_f-=delta_t1_f/3
                 elif delta_t1_f!=0 and delta_t1_f%3!=0:
-                        sequence_time2_f-=round(delta_t1_f/3,0)
+                        if sequence_time2_f >= round(delta_t1_f/3,0):
+                                sequence_time2_f-=round(delta_t1_f/3,0)
+                        else:
+                                sequence_time1_f-=round(delta_t1_f/3,0)
                         delta_t1_f-=round(delta_t1_f/3,0)
-                        sequence_time3_f-=round(delta_t1_f/2,0)
+                        if sequence_time3_f >= round(delta_t1_f/2,0):
+                                sequence_time3_f-=round(delta_t1_f/2,0)
+                        else:
+                                sequence_time1_f-=round(delta_t1_f/2,0)
                         delta_t1_f-=round(delta_t1_f/2,0)
-                        sequence_time4_f-=delta_t1_f
-
+                        if sequence_time4_f >= delta_t1_f:
+                                sequence_time4_f-=delta_t1_f
+                        else:
+                                sequence_time1_f-=delta_t1_f
                 next_sequence_f+=sequence_time1_f
-                sequence_f+=1
+                sequence_f=2
                 '''
                 print("Time Fortuna:")
                 print(sequence_time1_f+sequence_time2_f+sequence_time3_f+sequence_time4_f)
@@ -419,22 +530,45 @@ while traci.simulation.getMinExpectedNumber()>0:
                 traci.trafficlight.setRedYellowGreenState(traffic_light_Fortuna, "grrrrrrggrrrrrg") #foutrol balra
                 delta_t2_f=sequence_control_fortuna(sequence_f)
                 #print(delta_t2_f)
+
+                if sequence_time2_f+delta_t2_f<=0:
+                        delta_t2_f=-sequence_time2_f+1
+                elif delta_t2_f>0 and sequence_time2_f+delta_t2_f>=sequence_time_max:
+                        delta_t2_f=0
                 sequence_time2_f+=delta_t2_f  #meddig tartson a zold jelzes
 
                 #fuzzy altal meghatarozott +- ido levonasa/hozzaadasa a tobbi zold jelzeshez
                 if delta_t2_f!=0 and delta_t2_f%3==0:
-                        sequence_time1_f-=delta_t2_f/3
-                        sequence_time3_f-=delta_t2_f/3
-                        sequence_time4_f-=delta_t2_f/3
+                        if sequence_time1_f >= delta_t2_f/3:
+                                sequence_time1_f-=delta_t2_f/3
+                        else:
+                                sequence_time2_f-=delta_t2_f/3
+                        if sequence_time3_f >= delta_t2_f/3:
+                                sequence_time3_f-=delta_t2_f/3
+                        else:
+                                sequence_time2_f-=delta_t2_f/3
+                        if sequence_time4_f >= delta_t2_f/3:
+                                sequence_time4_f-=delta_t2_f/3
+                        else:
+                                sequence_time2_f-=delta_t2_f/3
                 elif delta_t2_f!=0 and delta_t2_f%3!=0:
-                        sequence_time1_f-=round(delta_t2_f/3,0)
+                        if sequence_time1_f >= round(delta_t2_f/3,0):
+                                sequence_time1_f-=round(delta_t2_f/3,0)
+                        else:
+                                sequence_time2_f-=round(delta_t2_f/3,0)
                         delta_t2_f-=round(delta_t2_f/3,0)
-                        sequence_time3_f-=round(delta_t2_f/2,0)
+                        if sequence_time3_f >= round(delta_t2_f/2,0):
+                                sequence_time3_f-=round(delta_t2_f/2,0)
+                        else:
+                                sequence_time2_f-=round(delta_t2_f/2,0)
                         delta_t2_f-=round(delta_t2_f/2,0)
-                        sequence_time4_f-=delta_t2_f
+                        if sequence_time4_f >= delta_t2_f:
+                                sequence_time4_f-=delta_t2_f
+                        else:
+                                sequence_time2_f-=delta_t2_f
                 
                 next_sequence_f+=sequence_time2_f
-                sequence_f+=1
+                sequence_f=3
                 '''
                 print("Time Fortuna:")
                 print(sequence_time1_f+sequence_time2_f+sequence_time3_f+sequence_time4_f)
@@ -448,22 +582,45 @@ while traci.simulation.getMinExpectedNumber()>0:
                 traci.trafficlight.setRedYellowGreenState(traffic_light_Fortuna, "gggrrrrrggrrrrr") #mellekutrol elore
                 delta_t3_f=sequence_control_fortuna(sequence_f)
                 #print(delta_t3_f)
+
+                if sequence_time3_f+delta_t3_f<=0:
+                        delta_t3_f=-sequence_time3_f+1
+                elif delta_t3_f>0 and sequence_time3_f+delta_t3_f>=sequence_time_max:
+                        delta_t3_f=0
                 sequence_time3_f+=delta_t3_f  #meddig tartson a zold jelzes
 
                 #fuzzy altal meghatarozott +- ido levonasa/hozzaadasa a tobbi zold jelzeshez
                 if delta_t3_f!=0 and delta_t3_f%3==0:
-                        sequence_time1_f-=delta_t3_f/3
-                        sequence_time2_f-=delta_t3_f/3
-                        sequence_time4_f-=delta_t3_f/3
+                        if sequence_time1_f >= delta_t3_f/3:
+                                sequence_time1_f-=delta_t3_f/3
+                        else:
+                                sequence_time3_f-=delta_t3_f/3
+                        if sequence_time2_f >= delta_t3_f/3:
+                                sequence_time2_f-=delta_t3_f/3
+                        else:
+                                sequence_time3_f-=delta_t3_f/3        
+                        if sequence_time4_f >= delta_t3_f/3:
+                                sequence_time4_f-=delta_t3_f/3
+                        else:
+                                sequence_time3_f-=delta_t3_f/3
                 elif delta_t3_f!=0 and delta_t3_f%3!=0:
-                        sequence_time1_f-=round(delta_t3_f/3,0)
+                        if sequence_time1_f >= round(delta_t3_f/3,0):
+                                sequence_time1_f-=round(delta_t3_f/3,0)
+                        else:
+                                sequence_time3_f-=round(delta_t3_f/3,0)
                         delta_t3_f-=round(delta_t3_f/3,0)
-                        sequence_time2_f-=round(delta_t3_f/2,0)
+                        if sequence_time2_f >= round(delta_t3_f/2,0):
+                                sequence_time2_f-=round(delta_t3_f/2,0)
+                        else:
+                                sequence_time3_f-=round(delta_t3_f/2,0)
                         delta_t3_f-=round(delta_t3_f/2,0)
-                        sequence_time4_f-=delta_t3_f
+                        if sequence_time4_f >= delta_t3_f:
+                                sequence_time4_f-=delta_t3_f
+                        else:
+                                sequence_time3_f-=delta_t3_f
 
                 next_sequence_f+=sequence_time3_f
-                sequence_f+=1
+                sequence_f=4
                 '''
                 print("Time Fortuna:")
                 print(sequence_time1_f+sequence_time2_f+sequence_time3_f+sequence_time4_f)
@@ -477,19 +634,43 @@ while traci.simulation.getMinExpectedNumber()>0:
                 traci.trafficlight.setRedYellowGreenState(traffic_light_Fortuna, "rrrggrrrrrggrrr") #mellekutrol balra
                 delta_t4_f=sequence_control_fortuna(sequence_f)
                 #print(delta_t4_f)
+
+                if sequence_time4_f+delta_t4_f<=0:
+                        delta_t4_f=-sequence_time4_f+1
+                elif delta_t4_f>0 and sequence_time4_f+delta_t4_f>=sequence_time_max:
+                        delta_t4_f=0
                 sequence_time4_f+=delta_t4_f  #meddig tartson a zold jelzes
+
 
                 #fuzzy altal meghatarozott +- ido levonasa/hozzaadasa a tobbi zold jelzeshez
                 if delta_t4_f!=0 and delta_t4_f%3==0:
-                        sequence_time1_f-=delta_t4_f/3
-                        sequence_time2_f-=delta_t4_f/3
-                        sequence_time3_f-=delta_t4_f/3
+                        if sequence_time1_f >= delta_t4_f/3:
+                                sequence_time1_f-=delta_t4_f/3
+                        else:
+                                sequence_time4_f-=delta_t4_f/3
+                        if sequence_time2_f >= delta_t4_f/3:
+                                sequence_time2_f-=delta_t4_f/3
+                        else:
+                                sequence_time4_f-=delta_t4_f/3
+                        if sequence_time3_f >= delta_t4_f/3:
+                                sequence_time3_f-=delta_t4_f/3
+                        else:
+                                sequence_time4_f-=delta_t4_f/3
                 elif delta_t4_f!=0 and delta_t4_f%3!=0:
-                        sequence_time1_f-=round(delta_t4_f/3,0)
+                        if sequence_time1_f >= round(delta_t4_f/3,0):
+                                sequence_time1_f-=round(delta_t4_f/3,0)
+                        else:
+                                sequence_time4_f-=round(delta_t4_f/3,0)
                         delta_t4_f-=round(delta_t4_f/3,0)
-                        sequence_time2_f-=round(delta_t4_f/2,0)
+                        if sequence_time2_f >= round(delta_t4_f/2,0):
+                                sequence_time2_f-=round(delta_t4_f/2,0)
+                        else:
+                                sequence_time4_f-=round(delta_t4_f/2,0)
                         delta_t4_f-=round(delta_t4_f/2,0)
-                        sequence_time3_f-=delta_t4_f
+                        if sequence_time3_f >= delta_t4_f:
+                                sequence_time3_f-=delta_t4_f
+                        else:
+                                sequence_time4_f-=delta_t4_f
 
                 next_sequence_f+=sequence_time4_f
                 sequence_f=1
@@ -506,119 +687,392 @@ while traci.simulation.getMinExpectedNumber()>0:
         if step==next_sequence_k and sequence_k==1:
                 traci.trafficlight.setRedYellowGreenState(traffic_ligt_kozpont, "rggrrrrrrrgggrrrrrrgrrgggg") #Dozsa Gyorgy elore
                 delta_t1_k=sequence_control_kozpont(sequence_k)
-                #print("DELTA1:"+str(delta_t1_k))
+                print("DELTA1:"+str(delta_t1_k))
 
+                if sequence_time1_k+delta_t1_k<=0:
+                        delta_t1_k=-sequence_time1_k+1
+                elif delta_t1_k>0 and sequence_time1_k+delta_t1_k>=sequence_time_max:
+                        delta_t1_k=0
                 sequence_time1_k+=delta_t1_k  #meddig tartson a zold jelzes
 
                 #fuzzy altal meghatarozott +- ido levonasa/hozzaadasa a tobbi zold jelzeshez
                 if delta_t1_k!=0 and delta_t1_k%3==0:
-                        sequence_time2_k-=delta_t1_k/3
-                        sequence_time3_k-=delta_t1_k/3
-                        sequence_time4_k-=delta_t1_k/3
+                        if sequence_time2_k >= delta_t1_k/3:
+                                sequence_time2_k-=delta_t1_k/3
+                        else:
+                                sequence_time1_k-=delta_t1_k/3
+                        if sequence_time3_k >= delta_t1_k/3:
+                                sequence_time3_k-=delta_t1_k/3
+                        else:
+                                sequence_time1_k-=delta_t1_k/3
+                        if sequence_time4_k >= delta_t1_k/3:
+                                sequence_time4_k-=delta_t1_k/3
+                        else:
+                                sequence_time1_k-=delta_t1_k/3
                 elif delta_t1_k!=0 and delta_t1_k%3!=0:
-                        sequence_time2_k-=round(delta_t1_k/3,0)
+                        if sequence_time2_k >= round(delta_t1_k/3,0):
+                                sequence_time2_k-=round(delta_t1_k/3,0)
+                        else:
+                                sequence_time1_k-=round(delta_t1_k/3,0)
                         delta_t1_k-=round(delta_t1_k/3,0)
-                        sequence_time3_k-=round(delta_t1_k/2,0)
+                        if sequence_time3_k >= round(delta_t1_k/2,0):
+                                sequence_time3_k-=round(delta_t1_k/2,0)
+                        else:
+                                sequence_time1_k-=round(delta_t1_k/2,0)
                         delta_t1_k-=round(delta_t1_k/2,0)
-                        sequence_time4_k-=delta_t1_k
+                        if sequence_time4_k >= delta_t1_k:
+                                sequence_time4_k-=delta_t1_k
+                        else:
+                                sequence_time1_k-=delta_t1_k
 
                 next_sequence_k+=sequence_time1_k
-                sequence_k+=1
-                '''
+                sequence_k=2
+                
                 print("Time kozpont:")
                 print(sequence_time1_k+sequence_time2_k+sequence_time3_k+sequence_time4_k)
                 print(sequence_time1_k)
                 print(sequence_time2_k)
                 print(sequence_time3_k)
                 print(sequence_time4_k)
-                '''
+                
 
         elif step==next_sequence_k and sequence_k==2:
                 traci.trafficlight.setRedYellowGreenState(traffic_ligt_kozpont, "rrrgggrrrrrrrgggrrrrgggggr") #Dozsa Gorgy balra
                 delta_t2_k=sequence_control_kozpont(sequence_k)
-                #print(delta_t2_k)
+                print(delta_t2_k)
+
+                if sequence_time2_k+delta_t2_k<=0:
+                        delta_t2_k=-sequence_time2_k+1
+                elif delta_t2_k>0 and sequence_time2_k+delta_t2_k>=sequence_time_max:
+                        delta_t2_k=0
                 sequence_time2_k+=delta_t2_k  #meddig tartson a zold jelzes
 
                 #fuzzy altal meghatarozott +- ido levonasa/hozzaadasa a tobbi zold jelzeshez
                 if delta_t2_k!=0 and delta_t2_k%3==0:
-                        sequence_time1_k-=delta_t2_k/3
-                        sequence_time3_k-=delta_t2_k/3
-                        sequence_time4_k-=delta_t2_k/3
+                        if sequence_time1_k >= delta_t2_k/3:
+                                sequence_time1_k-=delta_t2_k/3
+                        else:
+                                sequence_time2_k-=delta_t2_k/3
+                        if sequence_time3_k >= delta_t2_k/3:
+                                sequence_time3_k-=delta_t2_k/3
+                        else:
+                                sequence_time2_k-=delta_t2_k/3
+                        if sequence_time4_k >= delta_t2_k/3:
+                                sequence_time4_k-=delta_t2_k/3
+                        else:
+                                sequence_time2_k-=delta_t2_k/3
                 elif delta_t2_k!=0 and delta_t2_k%3!=0:
-                        sequence_time1_k-=round(delta_t2_k/3,0)
+                        if sequence_time1_k >= round(delta_t2_k/3,0):
+                                sequence_time1_k-=round(delta_t2_k/3,0)
+                        else:
+                                sequence_time2_k-=round(delta_t2_k/3,0)
                         delta_t2_k-=round(delta_t2_k/3,0)
-                        sequence_time3_k-=round(delta_t2_k/2,0)
+                        if sequence_time3_k >= round(delta_t2_k/2,0):
+                                sequence_time3_k-=round(delta_t2_k/2,0)
+                        else:
+                                sequence_time2_k-=round(delta_t2_k/2,0)
                         delta_t2_k-=round(delta_t2_k/2,0)
-                        sequence_time4_k-=delta_t2_k
+                        if sequence_time4_k >= delta_t2_k:
+                                sequence_time4_k-=delta_t2_k
+                        else:
+                                sequence_time2_k-=delta_t2_k
                 
                 next_sequence_k+=sequence_time2_k
-                sequence_k+=1
-                '''
+                sequence_k=3
+                
                 print("Time kozpont:")
                 print(sequence_time1_k+sequence_time2_k+sequence_time3_k+sequence_time4_k)
                 print(sequence_time1_k)
                 print(sequence_time2_k)
                 print(sequence_time3_k)
                 print(sequence_time4_k)
-                '''
+                
 
         elif step==next_sequence_k and sequence_k==3:
                 traci.trafficlight.setRedYellowGreenState(traffic_ligt_kozpont, "rrrrrgggrrrrrrrggrrrgggggg")  #Hosszzu utca elore, jobbra
                 delta_t3_k=sequence_control_kozpont(sequence_k)
-                #print(delta_t3_k)
+                print(delta_t3_k)
+
+                if sequence_time3_k+delta_t3_k<=0:
+                        delta_t3_k=-sequence_time3_k+1
+                elif delta_t3_k>0 and sequence_time3_k+delta_t3_k>=sequence_time_max:
+                        delta_t3_k=0
                 sequence_time3_k+=delta_t3_k  #meddig tartson a zold jelzes
 
                 #fuzzy altal meghatarozott +- ido levonasa/hozzaadasa a tobbi zold jelzeshez
                 if delta_t3_k!=0 and delta_t3_k%3==0:
-                        sequence_time1_k-=delta_t3_k/3
-                        sequence_time2_k-=delta_t3_k/3
-                        sequence_time4_k-=delta_t3_k/3
+                        if sequence_time1_k >= delta_t3_k/3:
+                                sequence_time1_k-=delta_t3_k/3
+                        else:
+                                sequence_time3_k-=delta_t3_k/3
+                        if sequence_time2_k >= delta_t3_k/3:
+                                sequence_time2_k-=delta_t3_k/3
+                        else:
+                                sequence_time3_k-=delta_t3_k/3
+                        if sequence_time4_k >= delta_t3_k/3:
+                                sequence_time4_k-=delta_t3_k/3
+                        else:
+                                sequence_time3_k-=delta_t3_k/3
                 elif delta_t3_k!=0 and delta_t3_k%3!=0:
-                        sequence_time1_k-=round(delta_t3_k/3,0)
+                        if sequence_time1_k >= round(delta_t3_k/3,0):
+                                sequence_time1_k-=round(delta_t3_k/3,0)
+                        else:
+                                sequence_time3_k-=round(delta_t3_k/3,0)
                         delta_t3_k-=round(delta_t3_k/3,0)
-                        sequence_time2_k-=round(delta_t3_k/2,0)
+                        if sequence_time2_k >= round(delta_t3_k/2,0):
+                                sequence_time2_k-=round(delta_t3_k/2,0)
+                        else:
+                                sequence_time3_k-=round(delta_t3_k/2,0)
                         delta_t3_k-=round(delta_t3_k/2,0)
-                        sequence_time4_k-=delta_t3_k
+                        if sequence_time4_k >= delta_t3_k:
+                                sequence_time4_k-=delta_t3_k
+                        else:
+                                sequence_time3_k-=delta_t3_k
+
 
                 next_sequence_k+=sequence_time3_k
-                sequence_k+=1
-                '''
+                sequence_k=4
+                
                 print("Time kozpont:")
                 print(sequence_time1_k+sequence_time2_k+sequence_time3_k+sequence_time4_k)
                 print(sequence_time1_k)
                 print(sequence_time2_k)
                 print(sequence_time3_k)
                 print(sequence_time4_k)
-                '''
+                
 
         elif step==next_sequence_k and sequence_k==4:
                 traci.trafficlight.setRedYellowGreenState(traffic_ligt_kozpont, "grrrrrrrgggrrrrrrggggggggg")   ##Hosszu utca balra
-                #delta_t4_k=sequence_control_kozpont(sequence_k)
+                delta_t4_k=sequence_control_kozpont(sequence_k)
                 print(delta_t4_k)
+
+                if sequence_time4_k+delta_t4_k<=0:
+                        delta_t4_k=-sequence_time4_k+1
+                elif delta_t4_k>0 and sequence_time4_k+delta_t4_k>=sequence_time_max:
+                        delta_t4_k=0
                 sequence_time4_k+=delta_t4_k  #meddig tartson a zold jelzes
 
                 #fuzzy altal meghatarozott +- ido levonasa/hozzaadasa a tobbi zold jelzeshez
                 if delta_t4_k!=0 and delta_t4_k%3==0:
-                        sequence_time1_k-=delta_t4_k/3
-                        sequence_time2_k-=delta_t4_k/3
-                        sequence_time3_k-=delta_t4_k/3
+                        if sequence_time1_k >= delta_t4_k/3:
+                                sequence_time1_k-=delta_t4_k/3
+                        else:
+                                sequence_time4_k-=delta_t4_k/3
+                        if sequence_time2_k >= delta_t4_k/3:
+                                sequence_time2_k-=delta_t4_k/3
+                        else:
+                                sequence_time4_k-=delta_t4_k/3
+                        if sequence_time3_k >= delta_t4_k/3:
+                                sequence_time3_k-=delta_t4_k/3
+                        else:
+                                sequence_time4_k-=delta_t4_k/3
                 elif delta_t4_k!=0 and delta_t4_k%3!=0:
-                        sequence_time1_k-=round(delta_t4_k/3,0)
+                        if sequence_time1_k >= round(delta_t4_k/3,0):
+                                sequence_time1_k-=round(delta_t4_k/3,0)
+                        else:
+                                sequence_time4_k-=round(delta_t4_k/3,0)
                         delta_t4_k-=round(delta_t4_k/3,0)
-                        sequence_time2_k-=round(delta_t4_k/2,0)
+                        if sequence_time2_k >= round(delta_t4_k/2,0):
+                                sequence_time2_k-=round(delta_t4_k/2,0)
+                        else:
+                                sequence_time4_k-=round(delta_t4_k/2,0)
                         delta_t4_k-=round(delta_t4_k/2,0)
-                        sequence_time3_k-=delta_t4_k
+                        if sequence_time3_k >= delta_t4_k:
+                                sequence_time3_k-=delta_t4_k
+                        else:
+                                sequence_time4_k-=delta_t4_k
+
 
                 next_sequence_k+=sequence_time4_k
                 sequence_k=1
-                '''
+                
                 print("Time kozpont:")
                 print(sequence_time1_k+sequence_time2_k+sequence_time3_k+sequence_time4_k)
                 print(sequence_time1_k)
                 print(sequence_time2_k)
                 print(sequence_time3_k)
                 print(sequence_time4_k)
-                '''
+                
+
+        #Fortuna
+        lane1_0_f=traci.lanearea.getLastStepVehicleNumber(detector1_0_f)
+        lane1_1_f=traci.lanearea.getLastStepVehicleNumber(detector1_1_f)
+        lane1_2_f=traci.lanearea.getLastStepVehicleNumber(detector1_2_f)
+        lane2_0_f=traci.lanearea.getLastStepVehicleNumber(detector2_0_f)
+        lane2_1_f=traci.lanearea.getLastStepVehicleNumber(detector2_1_f)
+        lane3_0_f=traci.lanearea.getLastStepVehicleNumber(detector3_0_f)
+        lane3_1_f=traci.lanearea.getLastStepVehicleNumber(detector3_1_f)
+        lane3_2_f=traci.lanearea.getLastStepVehicleNumber(detector3_2_f)
+        lane4_0_f=traci.lanearea.getLastStepVehicleNumber(detector4_0_f)
+        lane4_1_f=traci.lanearea.getLastStepVehicleNumber(detector4_1_f)
+        lane4_2_f=traci.lanearea.getLastStepVehicleNumber(detector4_2_f)
+        lane4_3_f=traci.lanearea.getLastStepVehicleNumber(detector4_3_f)
+
+        if lane1_0_f < lane1_0_f_prev:
+                fortuna+=lane1_0_f_prev-lane1_0_f
+
+        if lane1_1_f < lane1_1_f_prev:
+                fortuna+=lane1_1_f_prev-lane1_1_f
+
+        if lane1_2_f < lane1_2_f_prev:
+                fortuna+=lane1_2_f_prev-lane1_2_f
+
+        if lane2_0_f < lane2_0_f_prev:
+                fortuna+=lane2_0_f_prev-lane2_0_f
+
+        if lane2_1_f < lane2_1_f_prev:
+                fortuna+=lane2_1_f_prev-lane2_1_f
+
+        if lane3_0_f < lane3_0_f_prev:
+                fortuna+=lane3_0_f_prev-lane3_0_f
+        
+        if lane3_1_f < lane3_1_f_prev:
+                fortuna+=lane3_1_f_prev-lane3_1_f
+
+        if lane3_2_f < lane3_2_f_prev:
+                fortuna+=lane3_2_f_prev-lane3_2_f
+
+        if lane4_0_f < lane4_0_f_prev:
+                fortuna+=lane4_0_f_prev-lane4_0_f
+
+        if lane4_1_f < lane4_1_f_prev:
+                fortuna+=lane4_1_f_prev-lane4_1_f
+
+        if lane4_2_f < lane4_2_f_prev:
+                fortuna+=lane4_2_f_prev-lane4_2_f
+
+        if lane4_3_f < lane4_3_f_prev:
+                fortuna+=lane4_3_f_prev-lane4_3_f
+
+
+        lane1_0_f_prev=lane1_0_f
+        lane1_1_f_prev=lane1_1_f
+        lane1_2_f_prev=lane1_2_f
+        lane2_0_f_prev=lane2_0_f
+        lane2_1_f_prev=lane2_1_f
+        lane3_0_f_prev=lane3_0_f
+        lane3_1_f_prev=lane3_1_f
+        lane3_2_f_prev=lane3_2_f
+        lane4_0_f_prev=lane4_0_f
+        lane4_1_f_prev=lane4_1_f
+        lane4_2_f_prev=lane4_2_f
+        lane4_3_f_prev=lane4_3_f
+
+         #Ref
+        lane1_0=traci.lanearea.getLastStepVehicleNumber(detector1_0)
+        lane1_1=traci.lanearea.getLastStepVehicleNumber(detector1_1)
+        lane1_2=traci.lanearea.getLastStepVehicleNumber(detector1_2)
+        lane2_0=traci.lanearea.getLastStepVehicleNumber(detector2_0)
+        lane3_0=traci.lanearea.getLastStepVehicleNumber(detector3_0)
+        lane3_1=traci.lanearea.getLastStepVehicleNumber(detector3_1)
+        lane3_2=traci.lanearea.getLastStepVehicleNumber(detector3_2)
+        lane4_0=traci.lanearea.getLastStepVehicleNumber(detector4_0)
+        lane4_1=traci.lanearea.getLastStepVehicleNumber(detector4_1)
+
+        if lane1_0<lane1_0_prev:
+                refo+=lane1_0_prev-lane1_0
+            
+        if lane1_1<lane1_1_prev:
+                refo+=lane1_1_prev-lane1_1
+
+        if lane1_2<lane1_2_prev:
+                refo+=lane1_2_prev-lane1_2
+
+        if lane2_0<lane2_0_prev:
+                refo+=lane2_0_prev-lane2_0
+
+        if lane3_0<lane3_0_prev:
+                refo+=lane3_0_prev-lane3_0
+
+        if lane3_1<lane3_1_prev:
+                refo+=lane3_1_prev-lane3_1
+
+        if lane3_2<lane3_2_prev:
+                refo+=lane3_2_prev-lane3_2
+        
+        if lane4_0<lane4_0_prev:
+                refo+=lane4_0_prev-lane4_0
+
+        if lane4_1<lane4_1_prev:
+                refo+=lane4_1_prev-lane4_1   
+
+        lane1_0_prev=lane1_0
+        lane1_1_prev=lane1_1
+        lane1_2_prev=lane1_2
+        lane2_0_prev=lane2_0
+        lane3_0_prev=lane3_0
+        lane3_1_prev=lane3_1
+        lane3_2_prev=lane3_2
+        lane4_0_prev=lane4_0
+        lane4_1_prev=lane4_1
+
+        #Kozpont
+        lane1_0_k=traci.lanearea.getLastStepVehicleNumber(detector1_0_k)
+        lane1_1_k=traci.lanearea.getLastStepVehicleNumber(detector1_1_k)
+        lane1_2_k=traci.lanearea.getLastStepVehicleNumber(detector1_2_k)
+        lane2_0_k=traci.lanearea.getLastStepVehicleNumber(detector2_0_k)
+        lane2_1_k=traci.lanearea.getLastStepVehicleNumber(detector2_1_k)
+        lane3_0_k=traci.lanearea.getLastStepVehicleNumber(detector3_0_k)
+        lane3_1_k=traci.lanearea.getLastStepVehicleNumber(detector3_1_k)
+        lane4_0_k=traci.lanearea.getLastStepVehicleNumber(detector4_0_k)
+        lane4_1_k=traci.lanearea.getLastStepVehicleNumber(detector4_1_k)
+        lane4_2_k=traci.lanearea.getLastStepVehicleNumber(detector4_2_k)
+
+        if lane1_0_k<lane1_0_k_prev:
+                kozpont+=lane1_0_k_prev-lane1_0_k
+
+        if lane1_1_k<lane1_1_k_prev:
+                kozpont+=lane1_1_k_prev-lane1_1_k
+        
+        if lane1_2_k<lane1_2_k_prev:
+                kozpont+=lane1_2_k_prev-lane1_2_k
+
+        if lane2_0_k<lane2_0_k_prev:
+                kozpont+=lane2_0_k_prev-lane2_0_k
+
+        if lane2_1_k<lane2_1_k_prev:
+                kozpont+=lane2_1_k_prev-lane2_1_k
+
+        if lane3_0_k<lane3_0_k_prev:
+                kozpont+=lane3_0_k_prev-lane3_0_k
+
+        if lane3_1_k<lane3_1_k_prev:
+                kozpont+=lane3_1_k_prev-lane3_1_k
+
+        if lane4_0_k<lane4_0_k_prev:
+                kozpont+=lane4_0_k_prev-lane4_0_k
+        
+        if lane4_1_k<lane4_1_k_prev:
+                kozpont+=lane4_1_k_prev-lane4_1_k
+
+        if lane4_2_k<lane4_2_k_prev:
+                kozpont+=lane4_2_k_prev-lane4_2_k
+
+        lane1_0_k_prev=lane1_0_k
+        lane1_1_k_prev=lane1_1_k
+        lane1_2_k_prev=lane1_2_k
+        lane2_0_k_prev=lane2_0_k
+        lane2_1_k_prev=lane2_1_k
+        lane3_0_k_prev=lane3_0_k
+        lane3_1_k_prev=lane3_1_k
+        lane4_0_k_prev=lane4_0_k
+        lane4_1_k_prev=lane4_1_k
+        lane4_2_k_prev=lane4_2_k
+        
+
+
+        #print("Fortuna: "+str(fortuna))
+        #print("Refo: "+str(refo))
+        print("Kozpont: "+ str(kozpont))
+
+        fortuna_v.append(fortuna)
+        refo_v.append(refo)
+        kozpont_v.append(kozpont)
 
         step += 1
+
+        if step%100==0:
+                np.savetxt('fortuna_fuzzy.txt', fortuna_v,fmt="%d", delimiter=" ")
+                np.savetxt('refo_fuzzy.txt', refo_v,fmt="%d", delimiter=" ")
+                np.savetxt('kozpont_fuzzy.txt', kozpont_v,fmt="%d", delimiter=" ")
 traci.close()
