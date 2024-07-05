@@ -119,7 +119,7 @@ class FuzzySystem:
                   self.inmem.triangle(val, self.inmem.width1, self.inmem.center1[i]) for val in x]
             axs[0].plot(x, y1, label=f'{val1[i]} = {self.inmem.center1[i]}')
 
-        axs[0].set_title('Tagsági függvények az 1. bemenetre')
+        axs[0].set_title('Tagsági függvények az első bemenetre')
         axs[0].legend()
         axs[0].grid(True)
         axs[0].set_xlabel("Járművek száma", loc="right")
@@ -131,10 +131,10 @@ class FuzzySystem:
                   self.inmem.triangle(val, self.inmem.width2, self.inmem.center2[i]) for val in x]
             axs[1].plot(x, y2, label=f'{val2[i]} = {self.inmem.center2[i]}')
 
-        axs[1].set_title('Tagsági függvények a 2. bemenetre')
+        axs[1].set_title('Tagsági függvények a második bemenetre')
         axs[1].legend()
         axs[1].grid(True)
-        axs[1].set_xlabel("Járművek száma", loc="right")
+        axs[1].set_xlabel("Járművek számának változása", loc="right")
         
         plt.tight_layout()
         plt.show()
@@ -156,7 +156,7 @@ class FuzzySystem:
         ax.legend()
         ax.grid(True)
 
-        plt.xlabel("Járművek száma", loc="right")
+        plt.xlabel("Zöld időtartam módosítása [s]", loc="right")
         plt.tight_layout()
         plt.show()
 
@@ -175,7 +175,7 @@ class FuzzySystem:
             axs[0].fill_between(x, cut_y1, color='black', alpha=0.5)
         
         axs[0].axvline(input_points[0], color='red', linestyle='--', linewidth=1)
-        axs[0].set_title('Levágott tagsági függvények az 1. bemenetre')
+        axs[0].set_title('Levágott tagsági függvények az első bemenetre')
         axs[0].legend()
         axs[0].grid(True)
         axs[0].set_xlabel("Járművek száma", loc="right")
@@ -190,10 +190,10 @@ class FuzzySystem:
             axs[1].fill_between(x, cut_y2, color='black', alpha=0.5)
         
         axs[1].axvline(input_points[1], color='red', linestyle='--', linewidth=1)
-        axs[1].set_title('Levágott tagsági függvények a 2. bemenetre')
+        axs[1].set_title('Levágott tagsági függvények a második bemenetre')
         axs[1].legend()
         axs[1].grid(True)
-        axs[1].set_xlabel("Járművek száma", loc="right")
+        axs[1].set_xlabel("Járművek számának változása", loc="right")
 
         plt.tight_layout()
         plt.show()
@@ -218,7 +218,7 @@ class FuzzySystem:
         ax.legend()
         ax.grid(True)
 
-        plt.xlabel("Járművek száma", loc="right")
+        plt.xlabel("Zöld időtartam módosítása [s]", loc="right")
         plt.tight_layout()
         plt.show()
 

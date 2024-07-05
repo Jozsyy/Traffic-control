@@ -1,25 +1,35 @@
 import traci
 import fuzzy as fz
 import numpy as np
+import fuzzy_sync as fzs
 
 sumoCmd = ["sumo-gui", "-c", "osm.sumocfg"]
 traci.start(sumoCmd)
 
 step=0
+
+fortuna_v=[]
+refo_v=[]
+kozpont_v=[]
+
 kozpont=0
 refo=0
 fortuna=0
 
-fortuna_v=[]
-kozpont_v=[]
-refo_v=[]
-sequence_time_max=50
+fortuna_prev=0
+refo_prev=0
+kozpont_prev=0
+fortuna_prev2=0
+refo_prev2=0
+kozpont_prev2=0
+
+sequence_time_max=80
 
 ### Reformatus kollegium utcai keresztezodes
 sequence=1
-sequence_time1=30
-sequence_time2=30
-sequence_time3=30
+sequence_time1=45
+sequence_time2=45
+sequence_time3=45
 delta_t1=0
 delta_t2=0
 delta_t3=0
@@ -49,10 +59,10 @@ lane4_1_prev=0
 
 ### Fortuna keresztezodes
 sequence_f=4
-sequence_time1_f=25
-sequence_time2_f=25
-sequence_time3_f=25
-sequence_time4_f=25
+sequence_time1_f=40
+sequence_time2_f=40
+sequence_time3_f=40
+sequence_time4_f=40
 delta_t1_f=0
 delta_t2_f=0
 delta_t3_f=0
@@ -90,10 +100,10 @@ lane4_3_f_prev=0
 
 ### Kozpont keresztezodes
 sequence_k=2
-sequence_time1_k=25
-sequence_time2_k=25
-sequence_time3_k=25
-sequence_time4_k=25
+sequence_time1_k=40
+sequence_time2_k=40
+sequence_time3_k=40
+sequence_time4_k=40
 delta_t1_k=0
 delta_t2_k=0
 delta_t3_k=0
@@ -124,6 +134,53 @@ lane3_1_k_prev=0
 lane4_0_k_prev=0
 lane4_1_k_prev=0
 lane4_2_k_prev=0
+
+def waiting_cars_fortuna():
+        #Waiting cars by lane
+        lane1_0_f=traci.lanearea.getLastStepVehicleNumber(detector1_0_f)
+        lane1_1_f=traci.lanearea.getLastStepVehicleNumber(detector1_1_f)
+        lane1_2_f=traci.lanearea.getLastStepVehicleNumber(detector1_2_f)
+        lane2_0_f=traci.lanearea.getLastStepVehicleNumber(detector2_0_f)
+        lane2_1_f=traci.lanearea.getLastStepVehicleNumber(detector2_1_f)
+        lane3_0_f=traci.lanearea.getLastStepVehicleNumber(detector3_0_f)
+        lane3_1_f=traci.lanearea.getLastStepVehicleNumber(detector3_1_f)
+        lane3_2_f=traci.lanearea.getLastStepVehicleNumber(detector3_2_f)
+        lane4_0_f=traci.lanearea.getLastStepVehicleNumber(detector4_0_f)
+        lane4_1_f=traci.lanearea.getLastStepVehicleNumber(detector4_1_f)
+        lane4_2_f=traci.lanearea.getLastStepVehicleNumber(detector4_2_f)
+        lane4_3_f=traci.lanearea.getLastStepVehicleNumber(detector4_3_f)
+
+        return lane1_0_f+lane1_1_f+lane1_2_f+lane2_0_f+lane2_1_f+lane3_0_f+lane3_1_f+lane3_2_f+lane4_0_f+lane4_1_f+lane4_2_f+lane4_3_f
+
+def waiting_cars_ref():
+        #Waiting cars by lane
+        lane1_0=traci.lanearea.getLastStepVehicleNumber(detector1_0)
+        lane1_1=traci.lanearea.getLastStepVehicleNumber(detector1_1)
+        lane1_2=traci.lanearea.getLastStepVehicleNumber(detector1_2)
+        lane2_0=traci.lanearea.getLastStepVehicleNumber(detector2_0)
+        lane3_0=traci.lanearea.getLastStepVehicleNumber(detector3_0)
+        lane3_1=traci.lanearea.getLastStepVehicleNumber(detector3_1)
+        lane3_2=traci.lanearea.getLastStepVehicleNumber(detector3_2)
+        lane4_0=traci.lanearea.getLastStepVehicleNumber(detector4_0)
+        lane4_1=traci.lanearea.getLastStepVehicleNumber(detector4_1)
+
+        return lane1_0+lane1_1+lane1_2+lane2_0+lane3_0+lane3_1+lane3_2+lane4_0+lane4_1
+
+def waiting_cars_kozpont():
+        #Waiting cars by lane
+        lane1_0_k=traci.lanearea.getLastStepVehicleNumber(detector1_0_k)
+        lane1_1_k=traci.lanearea.getLastStepVehicleNumber(detector1_1_k)
+        lane1_2_k=traci.lanearea.getLastStepVehicleNumber(detector1_2_k)
+        lane2_0_k=traci.lanearea.getLastStepVehicleNumber(detector2_0_k)
+        lane2_1_k=traci.lanearea.getLastStepVehicleNumber(detector2_1_k)
+        lane3_0_k=traci.lanearea.getLastStepVehicleNumber(detector3_0_k)
+        lane3_1_k=traci.lanearea.getLastStepVehicleNumber(detector3_1_k)
+        lane4_0_k=traci.lanearea.getLastStepVehicleNumber(detector4_0_k)
+        lane4_1_k=traci.lanearea.getLastStepVehicleNumber(detector4_1_k)
+        lane4_2_k=traci.lanearea.getLastStepVehicleNumber(detector4_2_k)
+
+        return lane1_0_k+lane1_1_k+lane1_2_k+lane2_0_k+lane2_1_k+lane3_0_k+lane3_1_k+lane4_0_k+lane4_1_k+lane4_2_k
+
 
 def sequence_control_ref(sequence):
         global sequence1_cars_prev
@@ -169,12 +226,15 @@ def sequence_control_ref(sequence):
         print(f"Sequence 2 change:{sequence2_change}")
         print(f"Sequence 3 change:{sequence3_change}")
         '''
-
+        fuzzy_sync_output=0
         #Fuzzy control
         if step!=0:
                 fuzzy_system = fz.FuzzySystem()
+                fuzzy_system2 = fzs.FuzzySystem()
                 if sequence==1:
                         fuzzy_output=fuzzy_system.fuzzy_control(sequence1_cars, sequence1_change)
+                        fuzzy_sync_output=fuzzy_system2.fuzzy_control(7/30*(sequence3_cars-sequence1_cars)+0.5, 7/60*waiting_cars_kozpont()+0.5)
+                        print(f"Fuzzy2 output Ref: {fuzzy_sync_output}")
                 elif sequence==2:
                         fuzzy_output=fuzzy_system.fuzzy_control(sequence2_cars, sequence2_change)
                 else:
@@ -188,7 +248,7 @@ def sequence_control_ref(sequence):
         sequence3_cars_prev=sequence3_cars
 
         #print(f"Fuzzy output Ref: {fuzzy_output}")
-        return round(fuzzy_output,0)
+        return round(fuzzy_output+fuzzy_sync_output/5,0)
 
 def sequence_control_fortuna(sequence_f):
         global sequence1_cars_prev_f
@@ -210,21 +270,6 @@ def sequence_control_fortuna(sequence_f):
         lane4_2_f=traci.lanearea.getLastStepVehicleNumber(detector4_2_f)
         lane4_3_f=traci.lanearea.getLastStepVehicleNumber(detector4_3_f)
 
-        '''
-        print("Cars waiting in lane 1_0:"+str(lane1_0_f))
-        print("Cars waiting in lane 1_1:"+str(lane1_1_f))
-        print("Cars waiting in lane 1_2:"+str(lane1_2_f))
-        print("Cars waiting in lane 2_0:"+str(lane2_0_f))
-        print("Cars waiting in lane 2_1:"+str(lane2_1_f))
-        print("Cars waiting in lane 3_0:"+str(lane3_0_f))
-        print("Cars waiting in lane 3_1:"+str(lane3_1_f))
-        print("Cars waiting in lane 3_2:"+str(lane3_2_f))
-        print("Cars waiting in lane 4_0:"+str(lane4_0_f))
-        print("Cars waiting in lane 4_1:"+str(lane4_1_f))
-        print("Cars waiting in lane 4_2:"+str(lane4_2_f))
-        print("Cars waiting in lane 4_3:"+str(lane4_3_f))
-        '''
-
         sequence1_cars_f=lane2_0_f+lane2_1_f+lane4_0_f+lane4_1_f+lane4_2_f
         sequence2_cars_f=lane2_1_f+lane4_3_f
         sequence3_cars_f=lane1_0_f+lane1_1_f+lane3_0_f+lane3_1_f
@@ -234,22 +279,20 @@ def sequence_control_fortuna(sequence_f):
         sequence2_change_f=sequence2_cars_f-sequence2_cars_prev_f
         sequence3_change_f=sequence3_cars_f-sequence3_cars_prev_f
         sequence4_change_f=sequence4_cars_f-sequence4_cars_prev_f
-        '''
-        print(f"Sequence 1 change:{sequence1_change_f}")
-        print(f"Sequence 2 change:{sequence2_change_f}")
-        print(f"Sequence 3 change:{sequence3_change_f}")
-        print(f"Sequence 4 change:{sequence4_change_f}")
-        '''
 
+        fuzzy_sync_output=0
         #Fuzzy control
         if step!=0:
                 fuzzy_system = fz.FuzzySystem()
+                fuzzy_system2 = fzs.FuzzySystem()
                 if sequence_f==1:
                         fuzzy_output=fuzzy_system.fuzzy_control(sequence1_cars_f, sequence1_change_f)
                 elif sequence_f==2:
                         fuzzy_output=fuzzy_system.fuzzy_control(sequence2_cars_f, sequence2_change_f)
                 elif sequence_f==3:
                         fuzzy_output=fuzzy_system.fuzzy_control(sequence3_cars_f, sequence3_change_f)
+                        fuzzy_sync_output=fuzzy_system2.fuzzy_control(7/30*(sequence1_cars_f-sequence4_cars_f)+0.5, 7/60*waiting_cars_ref()+0.5)
+                        print(f"Fuzzy2 output Fortuna: {fuzzy_sync_output}")
                 else:
                         fuzzy_output=fuzzy_system.fuzzy_control(sequence4_cars_f, sequence4_change_f)
         else:
@@ -262,7 +305,7 @@ def sequence_control_fortuna(sequence_f):
         sequence4_cars_prev_f=sequence3_cars_f
 
         #print(f"Fuzzy output Fortuna: {fuzzy_output}")
-        return round(fuzzy_output,0)
+        return round(fuzzy_output+fuzzy_sync_output/5,0)
 
 def sequence_control_kozpont(sequence_k):
         global sequence1_cars_prev_k
@@ -392,7 +435,7 @@ while traci.simulation.getMinExpectedNumber()>0:
                 '''
 
         elif step==next_sequence and sequence==2:
-                traci.trafficlight.setRedYellowGreenState(traffic_light_ref, "rrrgggggggrrrggrrrr")
+                traci.trafficlight.setRedYellowGreenState(traffic_light_ref, "grrgggggggrrrggrrrr")
                 delta_t2=sequence_control_ref(sequence)
                 #print(delta_t2)
 
@@ -478,7 +521,7 @@ while traci.simulation.getMinExpectedNumber()>0:
         if step==next_sequence_f and sequence_f==1:
                 traci.trafficlight.setRedYellowGreenState(traffic_light_Fortuna, "rrrrgggrrrrgggr") #foutrol elore
                 delta_t1_f=sequence_control_fortuna(sequence_f)
-                #print("DELTA1:"+str(delta_t1_f))
+                print("DELTA1:"+str(delta_t1_f))
                        
                 if sequence_time1_f+delta_t1_f<=0:
                         delta_t1_f=-sequence_time1_f+1
@@ -1065,14 +1108,26 @@ while traci.simulation.getMinExpectedNumber()>0:
         #print("Refo: "+str(refo))
         print("Kozpont: "+ str(kozpont))
 
-        fortuna_v.append(fortuna)
-        refo_v.append(refo)
-        kozpont_v.append(kozpont)
-
         step += 1
+        '''
+        fortuna_v.append(waiting_cars_fortuna())
+        refo_v.append(waiting_cars_ref())
+        kozpont_v.append(waiting_cars_kozpont())
+        '''
+        if step%150==0:
 
-        if step%100==0:
-                np.savetxt('fortuna_fuzzy.txt', fortuna_v,fmt="%d", delimiter=" ")
-                np.savetxt('refo_fuzzy.txt', refo_v,fmt="%d", delimiter=" ")
-                np.savetxt('kozpont_fuzzy.txt', kozpont_v,fmt="%d", delimiter=" ")
+                fortuna_v.append(fortuna-fortuna_prev2)
+                refo_v.append(refo-refo_prev2)
+                kozpont_v.append(kozpont-kozpont_prev2)
+
+                np.savetxt('Meresek/fortuna_fuzzy.txt', fortuna_v, fmt="%d", delimiter=" ")
+                np.savetxt('Meresek/refo_fuzzy.txt', refo_v, fmt="%d", delimiter=" ")
+                np.savetxt('Meresek/kozpont_fuzzy.txt', kozpont_v, fmt="%d", delimiter=" ")
+
+                fortuna_prev2=fortuna_prev
+                fortuna_prev=fortuna
+                refo_prev2=refo_prev
+                refo_prev=refo
+                kozpont_prev2=kozpont_prev
+                kozpont_prev=kozpont
 traci.close()
