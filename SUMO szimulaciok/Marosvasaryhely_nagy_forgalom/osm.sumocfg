@@ -15,7 +15,7 @@
         <ignore-route-errors value="true"/>
     </processing>
 	
-	<max-num-vehicles value="4000"/>
+	<max-num-vehicles value="2000"/>
 
     <routing>
         <device.rerouting.adaptation-steps value="18"/>

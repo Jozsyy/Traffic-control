@@ -198,21 +198,6 @@ def sequence_control_ref(sequence):
         lane4_0=traci.lanearea.getLastStepVehicleNumber(detector4_0)
         lane4_1=traci.lanearea.getLastStepVehicleNumber(detector4_1)
 
-        '''
-        print("Cars waiting in lane 1_0:"+str(lane1_0))
-        print("Cars waiting in lane 1_1:"+str(lane1_1))
-        print("Cars waiting in lane 1_2:"+str(lane1_2))
-        print("Cars waiting in lane 2_0:"+str(lane2_0))
-        print("Cars waiting in lane 3_0:"+str(lane3_0))
-        print("Cars waiting in lane 3_1:"+str(lane3_1))
-        print("Cars waiting in lane 3_2:"+str(lane3_2))
-        print("Cars waiting in lane 4_0:"+str(lane4_0))
-        print("Cars waiting in lane 4_1:"+str(lane4_1))
-         
-        
-        waiting_cars=lane1_0+lane1_1+lane1_2+lane2_0+lane3_0+lane3_1+lane3_2+lane4_0+lane4_1
-        print("All waiting cars:"+str(waiting_cars))
-        '''
         sequence1_cars=lane1_0+lane1_1+lane3_0+lane3_1
         sequence2_cars=lane1_2+lane2_0+lane3_2
         sequence3_cars=lane4_0+lane4_1
@@ -221,11 +206,6 @@ def sequence_control_ref(sequence):
         sequence2_change=sequence2_cars-sequence2_cars_prev
         sequence3_change=sequence3_cars-sequence3_cars_prev
 
-        '''
-        print(f"Sequence 1 change:{sequence1_change}")
-        print(f"Sequence 2 change:{sequence2_change}")
-        print(f"Sequence 3 change:{sequence3_change}")
-        '''
         fuzzy_sync_output=0
         #Fuzzy control
         if step!=0:
@@ -234,7 +214,6 @@ def sequence_control_ref(sequence):
                 if sequence==1:
                         fuzzy_output=fuzzy_system.fuzzy_control(sequence1_cars, sequence1_change)
                         fuzzy_sync_output=fuzzy_system2.fuzzy_control(7/30*(sequence3_cars-sequence1_cars)+0.5, 7/60*waiting_cars_kozpont()+0.5)
-                        print(f"Fuzzy2 output Ref: {fuzzy_sync_output}")
                 elif sequence==2:
                         fuzzy_output=fuzzy_system.fuzzy_control(sequence2_cars, sequence2_change)
                 else:
@@ -292,7 +271,6 @@ def sequence_control_fortuna(sequence_f):
                 elif sequence_f==3:
                         fuzzy_output=fuzzy_system.fuzzy_control(sequence3_cars_f, sequence3_change_f)
                         fuzzy_sync_output=fuzzy_system2.fuzzy_control(7/30*(sequence1_cars_f-sequence4_cars_f)+0.5, 7/60*waiting_cars_ref()+0.5)
-                        print(f"Fuzzy2 output Fortuna: {fuzzy_sync_output}")
                 else:
                         fuzzy_output=fuzzy_system.fuzzy_control(sequence4_cars_f, sequence4_change_f)
         else:
@@ -325,20 +303,6 @@ def sequence_control_kozpont(sequence_k):
         lane4_1_k=traci.lanearea.getLastStepVehicleNumber(detector4_1_k)
         lane4_2_k=traci.lanearea.getLastStepVehicleNumber(detector4_2_k)
 
-        '''
-        print("Cars waiting in lane 4_2_k:"+str(lane4_2_k))
-        print("Cars waiting in lane 1_0_k:"+str(lane1_0_k))
-        print("Cars waiting in lane 1_1_k:"+str(lane1_1_k))
-        print("Cars waiting in lane 1_2_k:"+str(lane1_2_k))
-        print("Cars waiting in lane 2_0_k:"+str(lane2_0_k))
-        print("Cars waiting in lane 2_1_k:"+str(lane2_1_k))
-        print("Cars waiting in lane 3_0_k:"+str(lane3_0_k))
-        print("Cars waiting in lane 3_1_k:"+str(lane3_1_k))
-        print("Cars waiting in lane 4_0_k:"+str(lane4_0_k))
-        print("Cars waiting in lane 4_1_k:"+str(lane4_1_k))
-        '''
-
-
         sequence1_cars_k=lane1_0_k+lane1_1_k+lane1_2_k+lane3_0_k+lane3_1_k
         sequence2_cars_k=lane1_2_k+lane3_0_k
         sequence3_cars_k=lane2_0_k+lane2_1_k+lane4_0_k
@@ -348,14 +312,6 @@ def sequence_control_kozpont(sequence_k):
         sequence2_change_k=sequence2_cars_k-sequence2_cars_prev_k
         sequence3_change_k=sequence3_cars_k-sequence3_cars_prev_k
         sequence4_change_k=sequence4_cars_k-sequence4_cars_prev_k
-
-        '''
-        print(f"Sequence 1 change:{sequence1_change_k}")
-        print(f"Sequence 2 change:{sequence2_change_k}")
-        print(f"Sequence 3 change:{sequence3_change_k}")
-        print(f"Sequence 4 change:{sequence4_change_k}")
-        '''
-
 
         #Fuzzy control
         if step!=0:
@@ -385,17 +341,10 @@ while traci.simulation.getMinExpectedNumber()>0:
        
         traci.simulationStep()
 
-        #vehicles=traci.vehicle.getIDList()
-        #trafficlights=traci.trafficlight.getIDList()
-        #if step>20:
-        #        traci.vehicle.setSpeed("veh123",12.5)
-
-        #Reformatus kollegium        
+        #Stefan cel Mare utca-hosszu utcai keresztezodes (Reformatus kollegium utca)    
         if step==next_sequence and sequence==1:
                 traci.trafficlight.setRedYellowGreenState(traffic_light_ref, "gggrrrrrrrgggrrrrrr")
-                
                 delta_t1=sequence_control_ref(sequence)
-                #print(delta_t1)
 
                 if sequence_time1+delta_t1<=0:
                         delta_t1=-sequence_time1+1      #legalabb 1 mp-t minimum tart
@@ -426,18 +375,10 @@ while traci.simulation.getMinExpectedNumber()>0:
 
                 next_sequence+=sequence_time1
                 sequence=2
-                '''
-                print("Time:")
-                print(sequence_time1+sequence_time2+sequence_time3)
-                print(sequence_time1)
-                print(sequence_time2)
-                print(sequence_time3)
-                '''
 
         elif step==next_sequence and sequence==2:
                 traci.trafficlight.setRedYellowGreenState(traffic_light_ref, "grrgggggggrrrggrrrr")
                 delta_t2=sequence_control_ref(sequence)
-                #print(delta_t2)
 
                 if sequence_time2+delta_t2<=0:
                         delta_t2=-sequence_time2+1
@@ -468,18 +409,10 @@ while traci.simulation.getMinExpectedNumber()>0:
                 
                 next_sequence+=sequence_time2
                 sequence=3
-                '''
-                print("Time:")
-                print(sequence_time1+sequence_time2+sequence_time3)
-                print(sequence_time1)
-                print(sequence_time2)
-                print(sequence_time3)
-                '''
 
         elif step==next_sequence and sequence==3:
                 traci.trafficlight.setRedYellowGreenState(traffic_light_ref, "grrrrrrrrrrrrrrgggg")
                 delta_t3=sequence_control_ref(sequence)
-                #print(delta_t3)
 
                 if sequence_time3+delta_t3<=0:
                         delta_t3=-sequence_time3+1
@@ -510,18 +443,12 @@ while traci.simulation.getMinExpectedNumber()>0:
 
                 next_sequence+=sequence_time3
                 sequence=1
-                '''
-                print("Time:")
-                print(sequence_time1+sequence_time2+sequence_time3)
-                print(sequence_time1)
-                print(sequence_time2)
-                print(sequence_time3)
-                '''
+
         ### Fortuna
         if step==next_sequence_f and sequence_f==1:
                 traci.trafficlight.setRedYellowGreenState(traffic_light_Fortuna, "rrrrgggrrrrgggr") #foutrol elore
                 delta_t1_f=sequence_control_fortuna(sequence_f)
-                print("DELTA1:"+str(delta_t1_f))
+                #print(f"Szekvencia 1 zold ido modositasa: {delta_t1_f}")
                        
                 if sequence_time1_f+delta_t1_f<=0:
                         delta_t1_f=-sequence_time1_f+1
@@ -560,19 +487,16 @@ while traci.simulation.getMinExpectedNumber()>0:
                                 sequence_time1_f-=delta_t1_f
                 next_sequence_f+=sequence_time1_f
                 sequence_f=2
-                '''
-                print("Time Fortuna:")
-                print(sequence_time1_f+sequence_time2_f+sequence_time3_f+sequence_time4_f)
-                print(sequence_time1_f)
-                print(sequence_time2_f)
-                print(sequence_time3_f)
-                print(sequence_time4_f)
-                '''
+
+                print(f"Szekvencia 1 idotartam: {sequence_time1_f}")
+                print(f"Szekvencia 2 idotartam: {sequence_time2_f}")
+                print(f"Szekvencia 3 idotartam: {sequence_time3_f}")
+                print(f"Szekvencia 4 idotartam: {sequence_time4_f}")
 
         elif step==next_sequence_f and sequence_f==2:
                 traci.trafficlight.setRedYellowGreenState(traffic_light_Fortuna, "grrrrrrggrrrrrg") #foutrol balra
                 delta_t2_f=sequence_control_fortuna(sequence_f)
-                #print(delta_t2_f)
+                print(f"Szekvencia 2 zold ido modositasa: {delta_t2_f}")
 
                 if sequence_time2_f+delta_t2_f<=0:
                         delta_t2_f=-sequence_time2_f+1
@@ -612,19 +536,16 @@ while traci.simulation.getMinExpectedNumber()>0:
                 
                 next_sequence_f+=sequence_time2_f
                 sequence_f=3
-                '''
-                print("Time Fortuna:")
-                print(sequence_time1_f+sequence_time2_f+sequence_time3_f+sequence_time4_f)
-                print(sequence_time1_f)
-                print(sequence_time2_f)
-                print(sequence_time3_f)
-                print(sequence_time4_f)
-                '''
+
+                print(f"Szekvencia 1 idotartam: {sequence_time1_f}")
+                print(f"Szekvencia 2 idotartam: {sequence_time2_f}")
+                print(f"Szekvencia 3 idotartam: {sequence_time3_f}")
+                print(f"Szekvencia 4 idotartam: {sequence_time4_f}")
 
         elif step==next_sequence_f and sequence_f==3:
                 traci.trafficlight.setRedYellowGreenState(traffic_light_Fortuna, "gggrrrrrggrrrrr") #mellekutrol elore
                 delta_t3_f=sequence_control_fortuna(sequence_f)
-                #print(delta_t3_f)
+                print(f"Szekvencia 3 zold ido modositasa: {delta_t3_f}")
 
                 if sequence_time3_f+delta_t3_f<=0:
                         delta_t3_f=-sequence_time3_f+1
@@ -664,19 +585,16 @@ while traci.simulation.getMinExpectedNumber()>0:
 
                 next_sequence_f+=sequence_time3_f
                 sequence_f=4
-                '''
-                print("Time Fortuna:")
-                print(sequence_time1_f+sequence_time2_f+sequence_time3_f+sequence_time4_f)
-                print(sequence_time1_f)
-                print(sequence_time2_f)
-                print(sequence_time3_f)
-                print(sequence_time4_f)
-                '''
+
+                print(f"Szekvencia 1 idotartam: {sequence_time1_f}")
+                print(f"Szekvencia 2 idotartam: {sequence_time2_f}")
+                print(f"Szekvencia 3 idotartam: {sequence_time3_f}")
+                print(f"Szekvencia 4 idotartam: {sequence_time4_f}")
                 
         elif step==next_sequence_f and sequence_f==4:
                 traci.trafficlight.setRedYellowGreenState(traffic_light_Fortuna, "rrrggrrrrrggrrr") #mellekutrol balra
                 delta_t4_f=sequence_control_fortuna(sequence_f)
-                #print(delta_t4_f)
+                print(f"Szekvencia 4 zold ido modositasa: {delta_t4_f}")
 
                 if sequence_time4_f+delta_t4_f<=0:
                         delta_t4_f=-sequence_time4_f+1
@@ -717,20 +635,16 @@ while traci.simulation.getMinExpectedNumber()>0:
 
                 next_sequence_f+=sequence_time4_f
                 sequence_f=1
-                '''
-                print("Time Fortuna:")
-                print(sequence_time1_f+sequence_time2_f+sequence_time3_f+sequence_time4_f)
-                print(sequence_time1_f)
-                print(sequence_time2_f)
-                print(sequence_time3_f)
-                print(sequence_time4_f)
-                '''
+                print(f"Szekvencia 1 idotartam: {sequence_time1_f}")
+                print(f"Szekvencia 2 idotartam: {sequence_time2_f}")
+                print(f"Szekvencia 3 idotartam: {sequence_time3_f}")
+                print(f"Szekvencia 4 idotartam: {sequence_time4_f}")
+
 
         ### Kozpont
         if step==next_sequence_k and sequence_k==1:
                 traci.trafficlight.setRedYellowGreenState(traffic_ligt_kozpont, "rggrrrrrrrgggrrrrrrgrrgggg") #Dozsa Gyorgy elore
                 delta_t1_k=sequence_control_kozpont(sequence_k)
-                print("DELTA1:"+str(delta_t1_k))
 
                 if sequence_time1_k+delta_t1_k<=0:
                         delta_t1_k=-sequence_time1_k+1
@@ -769,20 +683,11 @@ while traci.simulation.getMinExpectedNumber()>0:
                                 sequence_time1_k-=delta_t1_k
 
                 next_sequence_k+=sequence_time1_k
-                sequence_k=2
-                
-                print("Time kozpont:")
-                print(sequence_time1_k+sequence_time2_k+sequence_time3_k+sequence_time4_k)
-                print(sequence_time1_k)
-                print(sequence_time2_k)
-                print(sequence_time3_k)
-                print(sequence_time4_k)
-                
+                sequence_k=2 
 
         elif step==next_sequence_k and sequence_k==2:
                 traci.trafficlight.setRedYellowGreenState(traffic_ligt_kozpont, "rrrgggrrrrrrrgggrrrrgggggr") #Dozsa Gorgy balra
                 delta_t2_k=sequence_control_kozpont(sequence_k)
-                print(delta_t2_k)
 
                 if sequence_time2_k+delta_t2_k<=0:
                         delta_t2_k=-sequence_time2_k+1
@@ -821,20 +726,11 @@ while traci.simulation.getMinExpectedNumber()>0:
                                 sequence_time2_k-=delta_t2_k
                 
                 next_sequence_k+=sequence_time2_k
-                sequence_k=3
-                
-                print("Time kozpont:")
-                print(sequence_time1_k+sequence_time2_k+sequence_time3_k+sequence_time4_k)
-                print(sequence_time1_k)
-                print(sequence_time2_k)
-                print(sequence_time3_k)
-                print(sequence_time4_k)
-                
+                sequence_k=3            
 
         elif step==next_sequence_k and sequence_k==3:
                 traci.trafficlight.setRedYellowGreenState(traffic_ligt_kozpont, "rrrrrgggrrrrrrrggrrrgggggg")  #Hosszzu utca elore, jobbra
                 delta_t3_k=sequence_control_kozpont(sequence_k)
-                print(delta_t3_k)
 
                 if sequence_time3_k+delta_t3_k<=0:
                         delta_t3_k=-sequence_time3_k+1
@@ -874,20 +770,11 @@ while traci.simulation.getMinExpectedNumber()>0:
 
 
                 next_sequence_k+=sequence_time3_k
-                sequence_k=4
-                
-                print("Time kozpont:")
-                print(sequence_time1_k+sequence_time2_k+sequence_time3_k+sequence_time4_k)
-                print(sequence_time1_k)
-                print(sequence_time2_k)
-                print(sequence_time3_k)
-                print(sequence_time4_k)
-                
+                sequence_k=4         
 
         elif step==next_sequence_k and sequence_k==4:
                 traci.trafficlight.setRedYellowGreenState(traffic_ligt_kozpont, "grrrrrrrgggrrrrrrggggggggg")   ##Hosszu utca balra
                 delta_t4_k=sequence_control_kozpont(sequence_k)
-                print(delta_t4_k)
 
                 if sequence_time4_k+delta_t4_k<=0:
                         delta_t4_k=-sequence_time4_k+1
@@ -928,15 +815,8 @@ while traci.simulation.getMinExpectedNumber()>0:
 
                 next_sequence_k+=sequence_time4_k
                 sequence_k=1
-                
-                print("Time kozpont:")
-                print(sequence_time1_k+sequence_time2_k+sequence_time3_k+sequence_time4_k)
-                print(sequence_time1_k)
-                print(sequence_time2_k)
-                print(sequence_time3_k)
-                print(sequence_time4_k)
-                
 
+        ###Keresztezodesen athaladt autok szamolasa      
         #Fortuna
         lane1_0_f=traci.lanearea.getLastStepVehicleNumber(detector1_0_f)
         lane1_1_f=traci.lanearea.getLastStepVehicleNumber(detector1_1_f)
@@ -1101,19 +981,15 @@ while traci.simulation.getMinExpectedNumber()>0:
         lane4_0_k_prev=lane4_0_k
         lane4_1_k_prev=lane4_1_k
         lane4_2_k_prev=lane4_2_k
-        
-
-
-        #print("Fortuna: "+str(fortuna))
-        #print("Refo: "+str(refo))
-        print("Kozpont: "+ str(kozpont))
 
         step += 1
+
         '''
         fortuna_v.append(waiting_cars_fortuna())
         refo_v.append(waiting_cars_ref())
         kozpont_v.append(waiting_cars_kozpont())
         '''
+
         if step%150==0:
 
                 fortuna_v.append(fortuna-fortuna_prev2)
